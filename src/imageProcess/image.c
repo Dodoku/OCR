@@ -3,4 +3,5 @@
 
 void load(char* path){
     SDL_Surface* image = IMG_Load(path);
+    printf("finished");
 }
