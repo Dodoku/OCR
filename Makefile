@@ -2,7 +2,7 @@
 # Makefile of OCR
 #
 #	make: Build all project
-#	make src/<module>: Build module
+#	make module/<module>: Build module
 #
 #	make init: Creating build folders
 #	make clean: Cleaning objects files
