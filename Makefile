@@ -2,7 +2,7 @@
 # Makefile of OCR
 #
 #	make: Build all project
-#	make module/<module>: Build module
+#	make src/<module>: Build module
 #
 #	make init: Creating build folders
 #	make clean: Cleaning objects files
@@ -22,7 +22,6 @@ OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 #
 # Init
 #
-all: ocr
 
 init:
 	@echo "Initialization..."
@@ -36,12 +35,16 @@ ocr: $(OBJ)
 	@echo "Linking OCR..."
 	@$(CC) -o $@ $^ $(LDFLAGS)
 
+#
 #Modules
+#
 
-module/%: $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(shell find $(SOURCE_DIR)/$(%) -name "*.c"))
+.SECONDEXPANSION:
+src/%: $$(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $$(shell find $$@ -name "*.c"))
 	@$(MAKE) -s init
+	@echo "$(shell echo $(shell echo $($^)))"
 	@echo "Linking $@..."
-	@$(CC) -o $(BUILD_DIR)/% $^ $(LDFLAGS)
+	@$(CC) -o $(BUILD_DIR)/$(@F) $^ $(LDFLAGS)
 
 #
 # Templates
