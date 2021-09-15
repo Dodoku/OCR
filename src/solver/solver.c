@@ -117,3 +117,76 @@ bool is_square_solved(int x, int y, int* grid){
     return true;
 }
 
+/*
+ * Returns true the grid is solved
+ * @param grid (int*) : array of sudoku grid
+ * @return (bool)
+ * @author Valentin Uhlrich
+ */
+bool is_solved(int* grid){
+    bool square, line, column;
+    for(int i = 0; i < sudoSize; i++){
+        square = is_square_solved((i%3)*3, (i/3)*3, grid);
+        line = is_line_solved(i, grid);
+        column = is_column_solved(i, grid);
+        if(!square || !line || !column) return false;
+    }
+    return true;
+}
+
+/*
+ * Returns true if the given column already contains the given value
+ * @param x (int) : index of the column
+ * @param val (int) : value that must be checked
+ * @param grid (int*) : array of sudoku grid
+ * @return (bool)
+ * @author Valentin Uhlrich
+ */
+bool already_in_column(int x, int val, int* grid){
+    for(int y = 0; y < sudoSize; y++){
+        if(*(grid + y*sudoSize + x) == val) return true; 
+    }
+    return false;
+}
+
+/*
+ * Returns true if the given line already contains the given value
+ * @param y (int) : index of the line
+ * @param val (int) : value that must be checked
+ * @param grid (int*) : array of sudoku grid
+ * @return (bool)
+ * @author Valentin Uhlrich
+ */
+bool already_in_line(int y, int val, int* grid){
+    for(int x = 0; x < sudoSize; x++){
+        if(*(grid + y*sudoSize + x) == val) return true; 
+    }
+    return false;
+}
+
+/*
+ * Returns true if the 3x3 square containing the given already contains the given value
+ * @param x (int) : index of the column
+ * @param y (int) : index of the line
+ * @param val (int) : value that must be checked
+ * @param grid (int*) : array of sudoku grid
+ * @return (bool)
+ * @author Valentin Uhlrich
+ */
+bool already_in_square(int x, int y, int val, int* grid){
+    for (int i = y/3*3; i < (y/3+1)*3; i++){
+        for (int j = x/3*3; j < (x/3+1)*3; j++){
+            if(*(grid + y*sudoSize + x) == val) return true;
+        }
+    }
+    return false;
+}
+
+bool solve_rec(int x, int y, int* grid){
+    
+}
+
+void solve(int* grid){
+    if(is_solved(grid)) return;
+    solve_rec(0, 0, grid);
+}
