@@ -12,6 +12,12 @@ SDL_Surface* load(char* path){
     return image;
 }
 
+void save(SDL_Surface* image, char* path){
+    if(IMG_SaveJPG(image, path, 100) < 0){
+        errx(1, "%s\n", IMG_GetError());
+    }
+}
+
 SDL_Color get_pixel(SDL_Surface* image, int x, int y){
     Uint32* pixel = (Uint32*) ((Uint8*) image->pixels 
                                     + x * image->format->BytesPerPixel
