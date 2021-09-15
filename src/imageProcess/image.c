@@ -18,8 +18,18 @@ SDL_Color get_pixel(SDL_Surface* image, int x, int y){
     Uint32* pixel = (Uint32*) ((Uint8*) image->pixels 
                                     + x * image->format->BytesPerPixel
                                     + y * image->pitch);
-    printf("res %u\n", *pixel);
     return int_to_color(*pixel);
+}
+
+void set_pixel(SDL_Surface* image, int x, int y, SDL_Color color){
+    Uint32* pixel = (Uint32*) ((Uint8*) image->pixels 
+                                    + x * image->format->BytesPerPixel
+                                    + y * image->pitch);
+    *pixel = color_to_int(color);  
+}
+
+SDL_Color to_color(int r, int g, int b, int a){
+    return (SDL_Color) {r, g, b, a};
 }
 
 //return a SDL_Color from a Uint32

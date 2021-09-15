@@ -1,19 +1,11 @@
-#include <SDL.h>
 #include <stdio.h>
+#include <SDL2/SDL.h>
+
 #include "image.h"
 
-//picture path "/home/nicolas/Desktop/OCR/tests/assets/image_02.jpeg"
-
 int main(){
-	SDL_Surface* picture = load("tests/assets/image_02.jpeg");
-	if(!picture){
-		printf("error in load\n");
-	}
-	else{
-		printf("picture loaded succefully!\n");
-	}
-
-
-	printf("\nlargeur:%d hauteur:%d\n", picture->w, picture->h);
-	return 0;
+	SDL_Surface* image = load("tests/assets/image_01.jpeg");
+    set_pixel(image, 0, 0, to_color(255,255,255,255));
+    SDL_Color pixel = get_pixel(image, 0, 0);
+    printf("r: %u, g: %u, b: %u, a: %u\n", pixel.r, pixel.g, pixel.b, pixel.a);
 }
