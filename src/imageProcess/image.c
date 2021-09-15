@@ -4,6 +4,12 @@
 
 #include "image.h"
 
+//return an empty SDL_Surface
+SDL_Surface* create_empty(int w, int h){
+    return  SDL_CreateRGBSurface(0, w, h, 32,
+     0, 0, 0, 0);
+}
+
 //return the surface from a path to load a picture
 SDL_Surface* load(char* path){
     SDL_Surface *image = IMG_Load(path);
