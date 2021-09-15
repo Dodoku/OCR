@@ -14,7 +14,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 
 CC = gcc
 CFLAGS = -Wall -Wextra $(shell sdl2-config --cflags)
-LDFLAGS = -export-dynamic $(shell sdl2-config --libs)
+LDFLAGS = -export-dynamic $(shell sdl2-config --libs) -lSDL2_image
 
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
 OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
@@ -22,7 +22,6 @@ OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 #
 # Init
 #
-all: ocr
 
 init:
 	@echo "Initialization..."
@@ -32,16 +31,20 @@ init:
 # Builds
 #
 ocr: $(OBJ)
-	@$(MAKE) -s init
 	@echo "Linking OCR..."
 	@$(CC) -o $@ $^ $(LDFLAGS)
+	@echo "Build Finished"
 
+#
 #Modules
+#
 
-module/%: $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(shell find $(SOURCE_DIR)/$(%) -name "*.c"))
-	@$(MAKE) -s init
+.SECONDEXPANSION:
+src-dependencies = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(shell find $(SOURCE_DIR)/$* -name "*.c")) 
+module/%: $${src-dependencies}
 	@echo "Linking $@..."
-	@$(CC) -o $(BUILD_DIR)/% $^ $(LDFLAGS)
+	@$(CC) -o $(BUILD_DIR)/$(@F) $^ $(LDFLAGS)
+	@echo "Build Finished"
 
 #
 # Templates
