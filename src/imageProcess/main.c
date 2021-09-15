@@ -1,23 +1,11 @@
-#include <SDL.h>
 #include <stdio.h>
+#include <SDL2/SDL.h>
+
+#include "image.h"
 
 int main(){
-	SDL_Window *window = NULL;
-	if(SDL_Init(SDL_INIT_VIDEO) != 0){
-		SDL_Log("init error%s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
-
-	window = SDL_CreateWindow("ma fenetre", SDL_WINDOWPOS_CENTERED,
-				SDL_WINDOWPOS_CENTERED, 800, 600, 0);
-
-	if(window != NULL){
-		SDL_Log("window inti error%s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
-
-	SDL_Delay(3000);
-
-	SDL_Quit();
-	return 0;
+	SDL_Surface* image = load("tests/assets/image_01.jpeg");
+    set_pixel(image, 0, 0, to_color(255,255,255,255));
+    SDL_Color pixel = get_pixel(image, 0, 0);
+    printf("r: %u, g: %u, b: %u, a: %u\n", pixel.r, pixel.g, pixel.b, pixel.a);
 }
