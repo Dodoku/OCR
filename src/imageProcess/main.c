@@ -5,7 +5,9 @@
 
 #include "image.h"
 #include "rotate.h"
+#include "contrast.h"
+#include "greyScale.h"
 
 int main(){
-	//SDL_Surface* image = load("tests/assets/image_05.jpeg");c
+	return 0;
 }
