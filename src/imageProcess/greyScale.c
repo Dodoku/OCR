@@ -7,7 +7,7 @@
 
 SDL_Color greyscale(SDL_Color color){
 	SDL_Color grey;
-	Uint32 value = color.r * 0,21 + color.g * 0.72 + color.b * 0.07;
+	Uint32 value = color.r * 0.21 + color.g * 0.72 + color.b * 0.07;
 	grey.r = value;
 	grey.g = value;
 	grey.b = value;
@@ -60,7 +60,7 @@ SDL_Surface* to_black_and_white(SDL_Surface* image){
 	for(int i = 0; i < image->w; i++){
 		for(int j = 0; j < image->h; j++){
 			Uint32 value = get_pixel(image, i, j).r;
-			value = black_and_white(value, average);
+			SDL_Color color = black_and_white(value, average);
 			set_pixel(result, i, j, color);
 		}
 	}
