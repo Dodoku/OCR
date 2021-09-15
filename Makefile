@@ -14,7 +14,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 
 CC = gcc
 CFLAGS = -Wall -Wextra $(shell sdl2-config --cflags)
-LDFLAGS = -export-dynamic $(shell sdl2-config --libs) -lSDL2_image
+LDFLAGS = -export-dynamic $(shell sdl2-config --libs) -lm -lSDL2_image
 
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
 OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))

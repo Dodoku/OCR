@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 
+SDL_Surface* create_empty(int w, int h);
+
 SDL_Surface* load(char* path);
 
 SDL_Color get_pixel(SDL_Surface* image, int x, int y);
