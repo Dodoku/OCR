@@ -7,5 +7,5 @@
 #include "rotate.h"
 
 int main(){
-	//SDL_Surface* image = load("tests/assets/image_05.jpeg");
+	//SDL_Surface* image = load("tests/assets/image_05.jpeg");c
 }
