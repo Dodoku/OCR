@@ -6,6 +6,7 @@
 SDL_Surface* create_empty(int w, int h);
 
 SDL_Surface* load(char* path);
+void save(SDL_Surface* image, char* path);
 
 SDL_Color get_pixel(SDL_Surface* image, int x, int y);
 void set_pixel(SDL_Surface* image, int x, int y, SDL_Color color);
