@@ -1,6 +1,7 @@
 #include <err.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
+#include <math.h>
 
 #include "image.h"
 
