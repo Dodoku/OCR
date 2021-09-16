@@ -182,10 +182,40 @@ bool already_in_square(int x, int y, int val, int* grid){
     return false;
 }
 
+/*
+ * Returns ture if the grid is solved
+ * @param x (int) : index of the column
+ * @param y (int) : index of the lien
+ * @param grid (int*) : array of sudoku grid
+ * @return (bool)
+ * @author Valentin Uhlrich
+ */
 bool solve_rec(int x, int y, int* grid){
-    
+    if(*(grid + y*sudoSize + x) != 0){
+        return solve_rec(x < 8 ? x + 1 : 0, x < 8 ? y : y + 1, grid);
+    }
+    int i = 1;
+    while(i <= 9){
+        bool valid = !already_in_column(x, i, grid)
+            && !already_in_line(y, i, grid) 
+            && !already_in_square(x, y, i, grid);
+        *(grid + y*sudoSize + x) = i;
+        if(valid){
+            if((x+1) * (y+1) >= 9*9) return true;
+            valid = solve_rec(x < 8 ? x + 1 : 0, x < 8 ? y : y + 1, grid);
+            if(valid) return true;
+        }
+        *(grid + y*sudoSize + x) = 0;
+        i++;
+    }
+    return false;
 }
 
+/*
+ * Try to solve sudoku
+ * @param grid (int*) : array of sudoku grid
+ * @author Valentin Uhlrich
+ */
 void solve(int* grid){
     if(is_solved(grid)) return;
     solve_rec(0, 0, grid);
