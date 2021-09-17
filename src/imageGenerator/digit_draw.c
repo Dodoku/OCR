@@ -3,9 +3,9 @@
 #include <SDL2/SDL_pixels.h>
 
 void one(SDL_Surface* image, int x, int y){
-	set_pixel(image,x+2,y,to_color(0,0,0,0));
-	set_pixel(image,x+1,y+1,to_color(0,0,0,0));
-	set_pixel(image,x,y+2,to_color(0,0,0,0));
+	set_pixel(image,x+2,y,to_color(100,100,100,255));
+	set_pixel(image,x+1,y+1,to_color(100,100,100,255));
+	set_pixel(image,x,y+2,to_color(100,100,100,255));
 }
 
 void two(SDL_Surface* image, int x, int y){

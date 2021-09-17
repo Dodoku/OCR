@@ -1,10 +1,10 @@
-#include "../imageProcess/image.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 #include "digit_draw.h"
+#include "../imageProcess/image.h"
 
 void display_digit(SDL_Surface* image, int x, int y, int n){
-	switch(x){
+	switch(n){
 		case 1:
 			one(image,x,y);
 			break;
@@ -38,9 +38,10 @@ void display_digit(SDL_Surface* image, int x, int y, int n){
 }
 
 void generate_digit_picture(int sudoku[], char* path[]){
-	SDL_Surface* image = create_empty(72, 179);
+	SDL_Surface* image = create_empty(71, 98);
 	int x = 3;
 	int y = 3;
 	display_digit(image,x,y,1);
-	save(image, "tests/refdturn.jpeg");
+	char dest[] = "tests/refdturn.jpeg";
+	save(image, dest);
 }
