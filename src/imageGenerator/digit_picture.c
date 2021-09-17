@@ -1,6 +1,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 #include "digit_draw.h"
+#include "wall_draw.h"
 #include "../imageProcess/image.h"
 
 void display_digit(SDL_Surface* image, int x, int y, int n){
@@ -38,10 +39,26 @@ void display_digit(SDL_Surface* image, int x, int y, int n){
 }
 
 void generate_digit_picture(int sudoku[], char* path[]){
-	SDL_Surface* image = create_empty(71, 98);
+	SDL_Surface* image = create_empty(73, 100);
+
 	int x = 3;
 	int y = 3;
+	int horizontal = 0;
+	int vertical = 0;
+	int index = 0;
+	horizontal_wall(image,0);
+	horizontal_wall(image,1);
+	horizontal_wall(image,2);
+	vertical_wall(image,0);
+	vertical_wall(image,1);
+	vertical_wall(image,2);
+	vertical_wall(image,9);
+	vertical_wall(image,16);
 	display_digit(image,x,y,1);
+	x += 7;
+	display_digit(image,x,y,2);
+	x += 7;
+	display_digit(image,x,y,3);
 	char dest[] = "tests/refdturn.jpeg";
 	save(image, dest);
 }
