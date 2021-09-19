@@ -50,6 +50,7 @@ void generate_digit_picture(int sudoku[], char* path[]){
 	horizontal_wall(image,1);
 	horizontal_wall(image,2);
 	horizontal_wall(image,12);
+	horizontal_wall(image,22);
 	vertical_wall(image,0);
 	vertical_wall(image,1);
 	vertical_wall(image,2);
@@ -60,11 +61,20 @@ void generate_digit_picture(int sudoku[], char* path[]){
 	display_digit(image,x,y,2);
 	x += 7;
 	display_digit(image,x,y,3);
-	y = 13;
+	y += 10;
 	x = 3;
 	display_digit(image,x,y,4);
 	x += 7;
 	display_digit(image,x,y,5);
+	x += 7;
+	display_digit(image,x,y,6);
+	y += 10;
+	x = 3;
+	display_digit(image,x,y,7);
+	x += 7;
+	display_digit(image,x,y,8);
+	x += 7;
+	display_digit(image,x,y,9);
 	char dest[] = "tests/refdturn.jpeg";
 	save(image, dest);
 }
