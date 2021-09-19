@@ -41,40 +41,40 @@ void display_digit(SDL_Surface* image, int x, int y, int n){
 void generate_digit_picture(int sudoku[], char* path[]){
 	SDL_Surface* image = create_empty(73, 100);
 
-	int x = 3;
-	int y = 3;
-	int horizontal = 0;
-	int vertical = 0;
-	int index = 0;
 	horizontal_wall(image,0);
 	horizontal_wall(image,1);
 	horizontal_wall(image,2);
-	horizontal_wall(image,12);
-	horizontal_wall(image,22);
 	vertical_wall(image,0);
 	vertical_wall(image,1);
 	vertical_wall(image,2);
-	vertical_wall(image,9);
-	vertical_wall(image,16);
-	display_digit(image,x,y,1);
-	x += 7;
-	display_digit(image,x,y,2);
-	x += 7;
-	display_digit(image,x,y,3);
-	y += 10;
-	x = 3;
-	display_digit(image,x,y,4);
-	x += 7;
-	display_digit(image,x,y,5);
-	x += 7;
-	display_digit(image,x,y,6);
-	y += 10;
-	x = 3;
-	display_digit(image,x,y,7);
-	x += 7;
-	display_digit(image,x,y,8);
-	x += 7;
-	display_digit(image,x,y,9);
-	char dest[] = "tests/refdturn.jpeg";
-	save(image, dest);
+
+
+	int x = 3;
+	int y = 3;
+	int horizontal = 1;
+	int vertical = 1;
+	int index = 0;
+
+	for(int index=0;index<81;index++){
+		display_digit(image,x,y,sudoku[index]);
+		horizontal++;
+		if(horizontal%3==0){
+			vertical_wall(image,x+6);
+			vertical_wall(image,x+7);
+			vertical_wall(image,x+8);
+			if(horizontal==9){
+				vertical++;
+				x=3
+			}
+			else{
+				x+=9;
+			}
+		}
+		else{
+			vertical_wall(imagex+6)
+			x+=7
+		}
+	}
+
+	save(image, path);
 }

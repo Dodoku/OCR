@@ -3,6 +3,6 @@
 
 int main(){
 	int sudoku = {0,0,0,0};
-	generate_digit_picture(sudoku,"");
+	generate_digit_picture(sudoku,"generate.jpeg");
 	return 0;
 }
