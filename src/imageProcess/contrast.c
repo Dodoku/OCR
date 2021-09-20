@@ -4,7 +4,14 @@
 
 #include "image.h"
 
-//rise the contraste of the given picture
+/*
+ * What the function does
+ * @param image (SDL_Surface*) : the picture to contrast
+ * @param rate (double) : tell by how much contrast
+ * @return (SDL_Surface*) : return the treated picture
+ * @authur Nicolas Prevost
+ */
+
 SDL_Surface* contrast(SDL_Surface* image, double rate){
 
 	SDL_Surface* ret = create_empty(image->w, image->h);

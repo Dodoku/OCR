@@ -3,7 +3,13 @@
 #include "image.h"
 #include "rotate.h"
 
-//return the image with a "angle" rotation
+/*
+ * What the function does
+ * @param image (SDL_Surface*) : the picture to rotate
+ * @param angle (int) : gives the angle to rotate
+ * @return (SDL_Surface*) : return the rotated picture
+ * @authur Nicolas Prevost
+ */
 SDL_Surface* rotate(SDL_Surface* image, int angle){
 
     int width = image->w;

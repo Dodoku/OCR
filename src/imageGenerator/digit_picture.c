@@ -3,6 +3,15 @@
 #include "wall_draw.h"
 #include "../imageProcess/image.h"
 
+/*
+ * Draw the digit for each number in the sudoku
+ * @param image (SDL_Surface) : the image on which we display the digits
+ * @param x (int) : the x postion of the digit (to left)
+ * @param y (int) : the y postion of the digit
+ * @param n (int) : the number to display
+ * @authur Nicolas Prevost
+ */
+
 void display_digit(SDL_Surface* image, int x, int y, int n){
 	SDL_Surface* number;
 	switch(n){
@@ -43,6 +52,13 @@ void display_digit(SDL_Surface* image, int x, int y, int n){
 	}
 
 }
+
+/*
+ * Draw the digit for each number in the sudoku
+ * @param sudoku (int[]) : a 81 int array, that contains the sudoku data
+ * @param path (char[]*) : a string that contains the path to save the generated picture
+ * @authur Nicolas Prevost
+ */
 
 void generate_digit_picture(int sudoku[], char* path[]){
 	SDL_Surface* image = create_empty(993, 993);
