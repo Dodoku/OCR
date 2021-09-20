@@ -107,9 +107,9 @@ bool is_square_solved(int x, int y, int* grid){
     for(int n = 1; n <= sudoSize; n++){
         bool find = false;
 
-        for(int i = y/3*3; i <= (y/3+1) && !find; i++){
+        for(int i = y/3*3; i <= (y/3+1)*3 && !find; i++){
             for(int j = x/3*3; j < (x/3+1)*3 && !find; j++){
-                find = *(grid + y*sudoSize + x) == i;
+                find = *(grid + i*sudoSize + j) == n;
             }
         }
         if(!find) return false;
