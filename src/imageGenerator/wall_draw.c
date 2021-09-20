@@ -3,13 +3,13 @@
 #include <SDL2/SDL_pixels.h>
 
 void horizontal_wall(SDL_Surface* image,int y){
-	for(int i=0;i<73;i++){
+	for(int i=0;i<72;i++){
 		set_pixel(image, i,y,to_color(100,100,100,255));
 	}
 }
 
-void vertical_wall(SDL_Surface* image, int x){
+void vertical_wall(SDL_Surface* image, int x, int y){
 	for(int i=0;i<9;i++){
-		set_pixel(image, x,i,to_color(100,100,100,255));
+		set_pixel(image, x,i+y,to_color(100,100,100,255));
 	}
 }
