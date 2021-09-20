@@ -7,8 +7,13 @@
 
 //return an empty SDL_Surface
 SDL_Surface* create_empty(int w, int h){
-    return  SDL_CreateRGBSurface(0, w, h, 32,
-     0, 0, 0, 0);
+    SDL_Surface* ret = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+    for(int i=0;i<w;i++){
+        for(int j=0;j<h;j++){
+            set_pixel(ret,i,j,to_color(255,255,255,255));
+        }
+    }
+    return ret;
 }
 
 //return the surface from a path to load a picture
