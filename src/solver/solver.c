@@ -10,7 +10,7 @@
  * @param grid (int*) : empty array of sudoku grid
  * @author Valentin Uhlrich
  */
-void init_solver(char* path, int* grid){
+void init_grid(char* path, int* grid){
     FILE* fp;
     char c;
 
@@ -33,12 +33,22 @@ void init_solver(char* path, int* grid){
 }
 
 /*
+ * Save the grid in the file
+ * @param path (char*) : path of the out file
+ * @param grid (int*) : array of the sudoku grid that will be saved
+ * @author Valentin Uhlrich
+ */
+void save_grid(char* path, int* grid){
+    
+}
+
+/*
  * Prints the grid on the console
  * @param grid (int*) : array of sudoku grid
  * @author Valentin Uhlrich
  */
 void print_line(int size);
-void print_sudoku(int* grid){
+void print_grid(int* grid){
     for (int i = 0; i < sudoSize; i++){
         if(i % 3 == 0) print_line(sudoSize);
 
@@ -68,11 +78,11 @@ void print_line (int size){
  */
 bool is_column_solved(int x, int* grid){
     for(int i = 1; i <= sudoSize; i++){
-        bool find = false;
-        for(int y = 0; y < sudoSize && !find; y++){
-            find = *(grid + y*sudoSize + x) == i;
+        bool found = false;
+        for(int y = 0; y < sudoSize && !found; y++){
+            found = *(grid + y*sudoSize + x) == i;
         }
-        if(!find) return false;
+        if(!found) return false;
     }
     return true;
 }
@@ -86,11 +96,11 @@ bool is_column_solved(int x, int* grid){
  */
 bool is_line_solved(int y, int* grid){
     for(int i = 1; i <= sudoSize; i++){
-        bool find = false;
-        for(int x = 0; x < sudoSize && !find; x++){
-            find = *(grid + y*sudoSize + x) == i;
+        bool found = false;
+        for(int x = 0; x < sudoSize && !found; x++){
+            found = *(grid + y*sudoSize + x) == i;
         }
-        if(!find) return false;
+        if(!found) return false;
     }
     return true;
 }
@@ -104,16 +114,21 @@ bool is_line_solved(int y, int* grid){
  * @author Valentin Uhlrich
  */
 bool is_square_solved(int x, int y, int* grid){
-    for(int n = 1; n <= sudoSize; n++){
-        bool find = false;
 
-        for(int i = y/3*3; i <= (y/3+1)*3 && !find; i++){
-            for(int j = x/3*3; j < (x/3+1)*3 && !find; j++){
-                find = *(grid + i*sudoSize + j) == n;
+    x /= 3;
+    y /= 3;
+
+    for(int i = 1; i <= sudoSize; i++){
+        bool found = false;
+        for(int Y = 0; !found && Y < 3; Y++){
+            for(int X = 0; !found && X < 3; X++){
+                found = *(grid + (Y + y * 3)*sudoSize + (X + x *3)) == i;
             }
         }
-        if(!find) return false;
+
+        if(found) return false;
     }
+
     return true;
 }
 
@@ -126,7 +141,7 @@ bool is_square_solved(int x, int y, int* grid){
 bool is_solved(int* grid){
     bool square, line, column;
     for(int i = 0; i < sudoSize; i++){
-        square = is_square_solved((i%3)*3, (i/3)*3, grid);
+        square = is_square_solved(i / 3, i % 3, grid);
         line = is_line_solved(i, grid);
         column = is_column_solved(i, grid);
         if(!square || !line || !column) return false;
@@ -174,9 +189,13 @@ bool already_in_line(int y, int val, int* grid){
  * @author Valentin Uhlrich
  */
 bool already_in_square(int x, int y, int val, int* grid){
-    for (int i = y/3*3; i < (y/3+1)*3; i++){
-        for (int j = x/3*3; j < (x/3+1)*3; j++){
-            if(*(grid + y*sudoSize + x) == val) return true;
+    x /= 3;
+    y /= 3;
+            
+    for (int Y = 0; Y < 3; Y++){
+        for (int X = 0; X < 3; X++){
+          if (*(grid + (Y + y * 3)*sudoSize + (X + x * 3)) == val)
+            return true;
         }
     }
     return false;
