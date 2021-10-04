@@ -8,8 +8,6 @@ void init_grid(char* path, int* grid);
 void save_grid(char* path, int* grid);
 void print_grid(int* grid);
 
-bool is_square_solved(int x, int y, int* grid);
-
 void solve(int* grid);
 
 #endif

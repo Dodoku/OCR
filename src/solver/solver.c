@@ -39,7 +39,24 @@ void init_grid(char* path, int* grid){
  * @author Valentin Uhlrich
  */
 void save_grid(char* path, int* grid){
+    FILE* fp;
+
+    fp = fopen(path, "w");
     
+    for(int y = 0; y < sudoSize; y++){
+
+        if(y != 0 && y%3 == 0) fputs("\n", fp);
+
+        for(int x = 0; x < sudoSize; x++){
+            if(x != 0 && x%3 == 0) fputs(" ", fp);
+
+            fprintf(fp, "%i", *(grid + y*sudoSize + x));
+        }
+
+        if(y < sudoSize - 1) fputs("\n", fp);
+    }
+
+    fclose(fp);
 }
 
 /*

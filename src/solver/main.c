@@ -1,14 +1,24 @@
-#include<stdbool.h>
-
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "solver.h"
 
-int main(){
+int main(int argc, char **argv){
     int grid[9*9] = { 0 };
-    init_grid("tests/solver/grid_01", grid);
-    print_grid(grid);
+    if(argc < 2){
+        printf("Error: missing path argument\n");
+        return EXIT_FAILURE;
+    }
+
+    init_grid(argv[1], grid);
+
     solve(grid);
-    print_grid(grid);
-    printf("%i", is_square_solved(0, 0, grid));
-    return 0;
+
+    char *out = argv[1];
+    strcat(out, ".out");
+    save_grid(out, grid);
+
+    printf("Sudoku solved and saved to \"%s\"\n", out);
+    return EXIT_SUCCESS;
 }
