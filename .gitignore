@@ -54,3 +54,6 @@ dkms.conf
 #Build
 build/
 ocr
+
+#VScode
+.vscode/
