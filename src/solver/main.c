@@ -4,9 +4,9 @@
 
 #include "solver.h"
 
-int main(int argc, char **argv){
-    int grid[9*9] = { 0 };
-    if(argc < 2){
+int main(int argc, char **argv) {
+    int grid[9 * 9] = {0};
+    if (argc < 2) {
         printf("Error: missing path argument\n");
         return EXIT_FAILURE;
     }

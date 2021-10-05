@@ -16,8 +16,11 @@ CC = gcc
 CFLAGS = -Wall -Wextra $(shell sdl2-config --cflags)
 LDFLAGS = -export-dynamic $(shell sdl2-config --libs) -lm -lSDL2_image
 
+ALLFILES = $(shell find . -name "*.[ch]")
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
 OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
+
+all: init ocr
 
 #
 # Init
@@ -27,6 +30,13 @@ init:
 	@echo "Initialization..."
 	@mkdir -p $(BUILD_DIR) $(OBJ_DIR)
 
+#
+# Format
+#
+
+format:
+	@echo "Formating Files..."
+	@clang-format --style=file -i ${ALLFILES}
 #
 # Builds
 #

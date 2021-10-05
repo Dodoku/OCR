@@ -8,6 +8,6 @@
 #include "contrast.h"
 #include "greyScale.h"
 
-int main(){
-	return 0;
+int main() {
+    return 0;
 }
