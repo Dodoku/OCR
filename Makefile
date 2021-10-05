@@ -20,6 +20,8 @@ ALLFILES = $(shell find . -name "*.[ch]")
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
 OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 
+TOOLS = $(OBJ_DIR)/tools/image.o
+
 all: init ocr
 
 #
@@ -51,7 +53,7 @@ ocr: $(OBJ)
 
 .SECONDEXPANSION:
 src-dependencies = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(shell find $(SOURCE_DIR)/$* -name "*.c")) 
-module/%: $${src-dependencies}
+module/%: $${src-dependencies} ${TOOLS}
 	@echo "Linking $@..."
 	@$(CC) -o $(BUILD_DIR)/$(@F) $^ $(LDFLAGS)
 	@echo "Build Finished"
