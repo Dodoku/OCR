@@ -3,7 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 
-#include "image.h"
+#include "../tools/image.h"
 #include "rotate.h"
 #include "contrast.h"
 #include "greyScale.h"

@@ -3,7 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 
-#include "image.h"
+#include "../tools/image.h"
 
 SDL_Color greyscale(SDL_Color color) {
     SDL_Color grey;
