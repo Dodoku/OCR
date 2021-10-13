@@ -7,7 +7,7 @@
 
 SDL_Color greyscale(SDL_Color color) {
     SDL_Color grey;
-    Uint32 value = color.r * 0.21 + color.g * 0.72 + color.b * 0.07;
+    Uint32 value = (color.r + color.g + color.b)/3;
     grey.r = value;
     grey.g = value;
     grey.b = value;
@@ -18,7 +18,7 @@ SDL_Color greyscale(SDL_Color color) {
 SDL_Color black_and_white(Uint32 value, Uint32 average) {
     SDL_Color color;
     color.a = 255;
-    if (value > average) {
+    if (value < average) {
         color.r = 0;
         color.g = 0;
         color.b = 0;
@@ -39,7 +39,8 @@ Uint32 get_average(SDL_Surface *image) {
             average += color.r;
         }
     }
-    return average / (image->w * image->h);
+    Uint32 temp = (average / (image->w * image->h)); 
+    return temp;
 }
 
 SDL_Surface *to_greyscale(SDL_Surface *image) {
