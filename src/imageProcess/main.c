@@ -12,11 +12,14 @@
 int main() {
   SDL_Surface* image = load("./tests/assets/image_04.jpeg");
   save(image, "generate.jpeg");
-  image = noise_reduction(image);
-  image = noise_reduction(image);
-  image = noise_reduction(image);
-  image = noise_reduction(image);
+  for(int i = 0; i < 10; i++){
+    image = noise_reduction(image,0.8);
+  }
+
+
   save(image, "generate1.jpeg");
+  image = to_black_and_white(image);
+  save(image, "generate2.jpeg");
 
   return 0;
 }

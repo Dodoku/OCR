@@ -5,7 +5,7 @@
 
 #include "../tools/image.h"
 
-SDL_Surface* noise_reduction(SDL_Surface* image){
+SDL_Surface* noise_reduction(SDL_Surface* image, float x){
   SDL_Surface* ret = create_empty(image->w, image->h);
   for (int i = 1; i < image->w-1; i++) {
         for (int j = 1; j < image->h-1; j++) {
@@ -17,6 +17,24 @@ SDL_Surface* noise_reduction(SDL_Surface* image){
                 r+=pixel.r;
                 g+=pixel.g;
                 b+=pixel.b;
+                if(r > pixel.r){
+                  pixel.r=pixel.r*(1+x);
+                }
+                else{
+                  pixel.r=pixel.r*(1-x);
+                }
+                if(r > pixel.r){
+                  pixel.r=pixel.r*(1+x);
+                }
+                else{
+                  pixel.r=pixel.r*(1-x);
+                }
+                if(r > pixel.r){
+                  pixel.r=pixel.r*(1+x);
+                }
+                else{
+                  pixel.r=pixel.r*(1-x);
+                }
                 set_pixel(ret,i,j,to_color(r/9,g/9,b/9,0));
               }
             }
