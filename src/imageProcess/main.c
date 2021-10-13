@@ -12,9 +12,8 @@
 int main() {
   SDL_Surface* image = load("./tests/assets/image_04.jpeg");
   save(image, "generate.jpeg");
-  for(int i = 0; i < 10; i++){
-    image = noise_reduction(image,0.8);
-  }
+
+  image = noise_reduction(image,0.5);
 
 
   save(image, "generate1.jpeg");

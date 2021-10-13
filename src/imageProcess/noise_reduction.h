@@ -3,6 +3,6 @@
 
 #include <SDL2/SDL.h>
 
-SDL_Surface* noise_reduction(SDL_Surface* image,float x);
+SDL_Surface* noise_reduction(SDL_Surface* image, float x);
 
 #endif
