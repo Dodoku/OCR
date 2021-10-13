@@ -7,7 +7,16 @@
 #include "rotate.h"
 #include "contrast.h"
 #include "greyScale.h"
+#include "noise_reduction.h"
 
 int main() {
-    return 0;
+  SDL_Surface* image = load("./tests/assets/image_04.jpeg");
+  save(image, "generate.jpeg");
+  image = noise_reduction(image);
+  image = noise_reduction(image);
+  image = noise_reduction(image);
+  image = noise_reduction(image);
+  save(image, "generate1.jpeg");
+
+  return 0;
 }
