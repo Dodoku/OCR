@@ -1,6 +1,7 @@
 #include <err.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_rect.h>
 #include <math.h>
 
 #include "image.h"
@@ -64,4 +65,17 @@ SDL_Color int_to_color(Uint32 value) {
 Uint32 color_to_int(SDL_Color color) {
     return (Uint32) ((color.r) + (color.g << 8) + (color.b << 16)
                      + (color.a << 24));
+}
+
+/*
+ * Resize image surface with position of rectagle
+ * @param surface (SDL_Surface*) : source image
+ * @param position (SDL_Rect) : rectangle that resize image
+ * @return (SDL_Surface*) : new resized image
+ * @author Valentin Uhlrich
+ */
+SDL_Surface *resize_image(SDL_Surface* surface, SDL_Rect position){
+    SDL_Surface* final = SDL_CreateRGBSurface(0, position.w, position.h, 32, 0, 0, 0, 0);
+    SDL_BlitSurface(surface, &position, final, NULL);
+    return final;
 }
