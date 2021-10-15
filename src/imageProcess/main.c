@@ -10,5 +10,14 @@
 #include "noise_reduction.h"
 
 int main() {
+    char s[] = "./tests/assets/image_00.jpeg";
+    char s1[] = "0.jpeg";
+    for(int i = 1; i < 7; i++){
+        s[22] = '0'+i;
+        s1[0] = '0'+i;
+        SDL_Surface* image = load(s);
+        save(image, s1);
+    }
+
     return 0;
 }
