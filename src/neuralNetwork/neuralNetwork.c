@@ -103,6 +103,38 @@ void forward_prop(Network *net, double *inputs){
     }
 }
 
+void back_prop(Network *net, double *expOutput, double ratio){
+
+    for(int i = 0; i < net->output.nbNeurons; i++){
+        Neuron *neu = &net->output.neurons[i];
+        Layer *prev = get_layer(net, (net->nbHiddens)-1);
+
+        neu->value = expOutput[i] - neu->value; //Delta
+
+        for(int j = 0; j < prev->nbNeurons; j++)
+            neu->weights[j] = neu->weights[j] + ratio * 
+                                    prev->neurons[j].value * neu->value;
+    }
+
+    for(int i = net->nbHiddens-1; i >= 0; i--){
+        for(int j = 0; j < net->hiddens[i].nbNeurons; j++){
+            Neuron *neu = &net->hiddens[i].neurons[j];
+            Layer *prev = get_layer(net, i-1);
+            Layer *next = get_layer(net, i+1);
+
+            int sum = 0;
+            for(int k = 0; k < next->nbNeurons; k++)
+                sum += next->neurons[k].weights[j] * next->neurons[k].value;
+
+            neu->value = sigmoidPrime(neu->value) * sum; //Delta
+
+            for(int k = 0; k < prev->nbNeurons; k++)
+                neu->weights[k] = neu->weights[k] + ratio * 
+                                    prev->neurons[k].value * neu->value;
+        }
+    }
+}
+
 /*
  * Tools
  */
