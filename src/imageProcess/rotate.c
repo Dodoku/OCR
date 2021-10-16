@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "image.h"
+#include "../tools/image.h"
 #include "rotate.h"
 
 /*

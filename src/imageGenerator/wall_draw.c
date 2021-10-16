@@ -1,4 +1,4 @@
-#include "../imageProcess/image.h"
+#include "../tools/image.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 
