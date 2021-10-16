@@ -50,7 +50,7 @@ void save_data(Data *data, char *path){
 
     fp = fopen(path, "w");
 
-    fprintf("%f %f | ", data->nbLines, data->nbColumns);
+    fprintf(fp, "%i %i | ", data->nbLines, data->nbColumns);
 
     for(int i = 0; i < data->nbLines; i++){
         for(int j = 0; j < data->nbColumns; j++){
@@ -58,6 +58,7 @@ void save_data(Data *data, char *path){
             if(j < data->nbColumns-1)
                 fprintf(fp, " ");
         }
-        fprintf(fp, "\n");
+        if(i < data->nbLines-1)
+            fprintf(fp, "\n");
     }
 }
