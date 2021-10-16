@@ -3,6 +3,7 @@
 
 #include "neuralNetwork.h"
 
+
 double rand_num(double start, double end);
 
 /*
@@ -15,7 +16,6 @@ static void init_neuron(Neuron *neuron, int nbPrevNeurons){
         neuron->weights = (double*) malloc(nbPrevNeurons * 
                                         sizeof(*neuron->weights));
 
-    neuron->biais = rand_num(-1, 1);
     neuron->value = 0;
 
     for(int i = 0; i < nbPrevNeurons; i++)
@@ -93,7 +93,7 @@ void forward_prop(Network *net, double *inputs){
         for(int j = 0; j < layer->nbNeurons; j++){
             Neuron *neu = &layer->neurons[j];
             
-            double result = neu->biais;
+            double result = 0;
             for(int k = 0; k < prev->nbNeurons; k++){
                 result += prev->neurons[k].value * neu->weights[k];
             }
@@ -140,7 +140,7 @@ void back_prop(Network *net, double *expOutput, double ratio){
  */
 
 double rand_num(double start, double end){
-    return (end-start)*((double)random()/RAND_MAX)+start;
+    return (end-start)*((double)rand()/RAND_MAX)+start;
 }
 double sigmoid(double x){
     return 1.0/(exp(-x)+1.0);

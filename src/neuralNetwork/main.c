@@ -3,9 +3,18 @@
 #include <time.h>
 
 #include "neuralNetwork.h"
+#include "dataLoader.h"
 
 int main(){
     srand( time( NULL ) );
+
+    /*Data responses = load_data("tests/network/xor_responses.data");
+    
+    for(int i = 0; i < responses.nbLines; i++){
+        for(int j = 0; j < responses.nbColumns; j++)
+            printf("%f ", responses.data[i][j]);
+        printf("\n");
+    }*/
 
     Network net = init_network(2, 1, 6, 1);
     double inputs[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};
@@ -14,10 +23,10 @@ int main(){
     for(int h = 0; h < 1000; h++){
         for(int i = 0; i < 4; i++){
             forward_prop(&net, inputs[i]);
-            printf("Erreur [%i] : %f\n", i, exp[i][0]-
+            /*printf("Erreur [%i] : %f\n", i, exp[i][0]-
                                             net.output.neurons[i].value);
             for(int i = 0; i < net.output.nbNeurons; i++)
-                printf("Output [%i] :  %f\n\n", i, net.output.neurons[i].value);
+                printf("Output [%i] :  %f\n\n", i, net.output.neurons[i].value);*/
             back_prop(&net, exp[i], 1);
         }
     }
@@ -32,5 +41,7 @@ int main(){
         printf("Output[0] = %f\n", net.output.neurons[0].value); 
     }
     printf("Finished\n");
+
+    free_network(&net);
     return EXIT_SUCCESS;
 }

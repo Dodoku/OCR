@@ -6,7 +6,7 @@ typedef struct {
     int nbWeights;
 
     double *weights;
-    double biais;
+    //double biais; #not useful
 
     double value;
 
