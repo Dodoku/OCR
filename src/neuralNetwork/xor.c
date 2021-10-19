@@ -22,12 +22,14 @@ int train_xor(Network *net){
     while(valid < validCount && count < 100000){
         for(int i = 0; i < 4; i++){
             forward_prop(net, inputs[i]);
+
             if(exp[i][0] == 1 && net->output.neurons[0].value > 0.95)
                 valid++;
             else if(exp[i][0] == 0 && net->output.neurons[0].value < 0.05)
                 valid++;
             else
                 valid = 0;
+                
             back_prop(net, exp[i], 1);
             count++;
         }
