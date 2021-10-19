@@ -6,7 +6,8 @@ typedef struct {
     int nbWeights;
 
     double *weights;
-    //double biais; #not useful
+    double biais;
+    double delta;
 
     double value;
 
@@ -35,7 +36,11 @@ void free_network(Network *net);
 void forward_prop(Network *net, double *inputs);
 void back_prop(Network *net, double *expOutput, double ratio);
 
+Layer* get_layer(Network *net, int pos);
+
 double sigmoid(double x);
 double sigmoidPrime(double x);
+
+double rand_num(double start, double end);
 
 #endif

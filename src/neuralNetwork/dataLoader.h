@@ -12,4 +12,7 @@ typedef struct {
 Data load_data(char *path);
 void save_data(Data *data, char *path);
 
+Network load_network(char *path);
+void save_network(Network *net, char *path);
+
 #endif

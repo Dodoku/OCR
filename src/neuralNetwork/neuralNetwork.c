@@ -17,9 +17,10 @@ static void init_neuron(Neuron *neuron, int nbPrevNeurons){
                                         sizeof(*neuron->weights));
 
     neuron->value = 0;
+    neuron->delta = 0;
 
     for(int i = 0; i < nbPrevNeurons; i++)
-        neuron->weights[i] = rand_num(-1, 1);
+        neuron->weights[i] = rand_num(0, 1);
 }
 
 static void init_layer(Layer *layer, int nbNeurons, int nbPrevNeurons){
@@ -76,12 +77,6 @@ void free_network(Network *net){
  * Propagation
  */
 
-static Layer* get_layer(Network *net, int pos){
-    if(pos < 0) return &net->input;
-    if(pos >= net->nbHiddens) return &net->output;
-    return &net->hiddens[pos];
-}
-
 void forward_prop(Network *net, double *inputs){
     for(int i = 0; i < net->input.nbNeurons; i++)
         net->input.neurons[i].value = inputs[i];
@@ -109,11 +104,11 @@ void back_prop(Network *net, double *expOutput, double ratio){
         Neuron *neu = &net->output.neurons[i];
         Layer *prev = get_layer(net, (net->nbHiddens)-1);
 
-        neu->value = expOutput[i] - neu->value; //Delta
+        neu->delta = expOutput[i] - neu->value; //Delta
 
         for(int j = 0; j < prev->nbNeurons; j++)
             neu->weights[j] = neu->weights[j] + ratio * 
-                                    prev->neurons[j].value * neu->value;
+                                    prev->neurons[j].value * neu->delta;
     }
 
     for(int i = net->nbHiddens-1; i >= 0; i--){
@@ -124,13 +119,13 @@ void back_prop(Network *net, double *expOutput, double ratio){
 
             int sum = 0;
             for(int k = 0; k < next->nbNeurons; k++)
-                sum += next->neurons[k].weights[j] * next->neurons[k].value;
+                sum += next->neurons[k].weights[j] * next->neurons[k].delta;
 
-            neu->value = sigmoidPrime(neu->value) * sum; //Delta
+            neu->delta = sigmoidPrime(neu->value) * sum; //Delta
 
             for(int k = 0; k < prev->nbNeurons; k++)
                 neu->weights[k] = neu->weights[k] + ratio * 
-                                    prev->neurons[k].value * neu->value;
+                                    prev->neurons[k].value * neu->delta;
         }
     }
 }
@@ -139,8 +134,17 @@ void back_prop(Network *net, double *expOutput, double ratio){
  * Tools
  */
 
+
+Layer* get_layer(Network *net, int pos){
+    if(pos < 0) return &net->input;
+    if(pos >= net->nbHiddens) return &net->output;
+    return &net->hiddens[pos];
+}
+
 double rand_num(double start, double end){
-    return (end-start)*((double)rand()/RAND_MAX)+start;
+    double ran = (end-start)*((double)rand()/RAND_MAX)+start;
+    printf("%f\n", ran);
+    return ran;
 }
 double sigmoid(double x){
     return 1.0/(exp(-x)+1.0);
