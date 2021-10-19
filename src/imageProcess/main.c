@@ -9,5 +9,8 @@
 #include "greyScale.h"
 
 int main() {
+    SDL_Surface* image = load("../../tests/assets/image_01.jpeg");
+    SDL_Surface* grey = to_black_and_white(image);
+    save(grey, "../../tests/assets/grey.jpeg");
     return 0;
 }

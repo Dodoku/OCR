@@ -6,5 +6,6 @@
 #include "hough.h"
 
 int main() {
+    hough_transform();
     return 0;
 }

@@ -24,11 +24,20 @@ int** init_matrice(size_t height, size_t width){
 	return A;
 }
 
+void free_matrice(int** A, size_t height){
+	for (size_t i = 0; i < height; i++)
+		free(A[i]);
+
+	free(A);
+}
+
 void print_matrice(int**A, size_t height, size_t width){
 	for (size_t i = 0; i < height; i++){
-		for (size_t j = 0; j < width ; j++){
-			printf("A[%zu][%zu] = %i\n",i,j,A[i][j]);
-		}
+		printf("| ");
+        for (size_t j = 0; j < width ; j++){
+			printf("%i |",A[i][j]);
+        }
+        printf("\n");
 	}
 }
 
@@ -38,7 +47,7 @@ SDL_Surface* render_line(SDL_Surface image){
 */
 
 SDL_Surface* better_print(int** A, size_t height, size_t width){
-    SDL_Surface print = create_empty(height, width);
+    SDL_Surface* print = create_empty(height, width);
     for (size_t i = 0; i < height; i++){
         for (size_t j = 0; j < width; j++){
             int color = A[i][j];
@@ -50,9 +59,18 @@ SDL_Surface* better_print(int** A, size_t height, size_t width){
     return print;
 }
 
+void place_point(int** A, size_t x, size_t y, int max){
+    double rho;
+	for (double theta = 0; theta < 180; theta++){
+        theta = theta*(M_PI/180);
+        rho = max + x*cos(theta) + y*sin(theta);
+        A[(int)rho][(int)theta] += 1;
+    }
+}
+
 void mapping(SDL_Surface* image, int** A, int mid){
-    for (size_t i = 0; i < image->w; i++) {
-        for (size_t j = 0; j < image->h; j++) {
+    for (int i = 0; i < image->w; i++) {
+        for (int j = 0; j < image->h; j++) {
             Uint8 value = get_pixel(image, i, j).r;
             if (value == 255)
                 place_point(A, i, j, mid);
@@ -60,28 +78,16 @@ void mapping(SDL_Surface* image, int** A, int mid){
     }
 }
 
-void place_point(int** A, size_t x, size_t y, int max){
-    double rho;
-	for (double theta = 0; theta < 180; theta++){
-        theta = theta*(M_PI/180);
-        rho = max x*cos(theta) + y*sin(theta);
-        A[rho][theta] += 1;
-    }
-}
-
-void hough_transform(SDL_Surface* image){
+void hough_transform(){
+    SDL_Surface* image = load("../../test/assets/grey.jpeg");
     size_t height = image->h;
-    size_t weight = image->w;
-    int** A = init_matrice(2*(height + weight), 180);
-    mapping(image, A, h+w);
-    SDL_Surface* print = better_print(A, 2*(height + weight), 180);
-    save(*print, "../../tests/assets/sinus.jpeg");
-    free_matrice(A, 2*(height + weight));
+    size_t width = image->w;
+    int** A = init_matrice(2*(height + width), 180);
+    mapping(image, A, height+width);
+    SDL_Surface* print = better_print(A, 2*(height + width), 180);
+    save(print, "../../tests/assets/sinus.jpeg");
+    free_matrice(A, 2*(height + width));
 }
 
-void free_matrice(int** A, size_t height){
-	for (size_t i = 0; i < height; i++)
-		free(A[i]);
 
-	free(A);
-}
+
