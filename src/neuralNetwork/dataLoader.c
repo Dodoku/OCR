@@ -122,14 +122,13 @@ void save_network(Network *net, char *path){
     for(int i = 0; i <= net->nbHiddens; i++){
         Layer *layer = get_layer(net, i);
         for(int j = 0; j < layer->nbNeurons; j++){
-            printf("%i : ", layer->neurons[j].nbWeights);
             for(int k = 0; k < layer->neurons[j].nbWeights; k++){
                 data.data[line][k] = layer->neurons[j].weights[k];
             }
-            printf("\n");
             line++;
         }
     }
 
     save_data(&data, path);
+    free_data(&data);
 }

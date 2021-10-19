@@ -4,6 +4,7 @@
 
 #include "neuralNetwork.h"
 #include "dataLoader.h"
+#include "xor.h"
 
 void print_net(Network *net){
     for(int i = 0; i < net->nbHiddens; i++){
@@ -20,7 +21,15 @@ void print_net(Network *net){
 int main(){
     srand( time( NULL ) );
     
-    Network net = init_network(2, 1, 4, 1);
+    double inputs[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};
+
+    Network net = init_xor();
+    int count = train_xor(&net);
+    printf("Train efficent : %i", count);
+
+    save_network(&net, "tests/network/record_xor.data");
+
+    /*Network net = init_network(2, 1, 4, 1);
     double inputs[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};
     double **ip = malloc(4 * sizeof(double));
     for (int i = 0; i < 4; i++){
@@ -36,7 +45,7 @@ int main(){
             forward_prop(&net, inputs[i]);
             back_prop(&net, exp[i], 1);
         }
-    }
+    }*/
 
 
     printf("Learn Finish\n");
