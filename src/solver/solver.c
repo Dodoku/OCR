@@ -229,7 +229,7 @@ bool already_in_square(int x, int y, int val, int *grid) {
 }
 
 /*
- * Returns ture if the grid is solved
+ * Returns true if the grid is solved
  * @param x (int) : index of the column
  * @param y (int) : index of the lien
  * @param grid (int*) : array of sudoku grid

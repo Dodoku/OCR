@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "neuralNetwork.h"
+#include "xor.h"
 
 #define nbHiddens 1
 #define nbNeurons 4
@@ -10,6 +11,18 @@
 
 Network init_xor(){
     return init_network(2, nbHiddens, nbNeurons, 1);
+}
+
+void print_xor(Network *net){
+    double inputs[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};
+    double exp[4][1] =    { {0},   {1},   {1},   {0} };
+
+    for(int i = 0; i < 4; i++){
+        printf("\nInput[0] = %f\nInput[1] = %f\n---\n", 
+                                inputs[i][0], inputs[i][1]);
+        eval_xor(net, inputs[i][0], inputs[i][1]);
+        printf("Output[0] = %f\n", net->output.neurons[0].value); 
+    }
 }
 
 int train_xor(Network *net){
@@ -21,25 +34,25 @@ int train_xor(Network *net){
 
     while(valid < validCount && count < 100000){
             for(int i = 0; i < 4; i++){
-                forward_prop(net, inputs[i]);
+                double out = eval_xor(net, inputs[i][0], inputs[i][1]);
 
-                if(exp[i][0] == 1 && net->output.neurons[0].value > 0.95)
+                if(exp[i][0] == 1 && out > 0.95)
                     valid++;
-                else if(exp[i][0] == 0 && net->output.neurons[0].value < 0.05)
+                else if(exp[i][0] == 0 && out < 0.05)
                     valid++;
                 else
-                valid = 0;
-
-            back_prop(net, exp[i], 1);
-        }
+                    valid = 0;
+                back_prop(net, exp[i], 1);
+            }
         count++;
     }
 
-    return count;
+    return valid;
 }
 
 double eval_xor(Network *net, double a, double b){
-    double inputs[2] = {a, b};
-    forward_prop(net, inputs);
+    net->input.neurons[0].value = a;
+    net->input.neurons[1].value = b;
+    forward_prop(net);
     return net->output.neurons[0].value;
 }

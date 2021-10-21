@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
 
     if(argc >= 2){
         printf("Loading Network WITH Data file...\n");
-        net = load_network(args[0]);
+        net = load_network(argv[1]);
         printf("Loading Data finished");
     }else {
         net = init_xor();
@@ -30,43 +30,45 @@ int main(int argc, char *argv[]){
     }
 
 
-    printf("Network is ready !\n");
+    printf("Network is ready!\n");
     printf("---------------------\n\n");
 
     while (1){
+        double d1;
+        double d2;
 
-        for(int i = 0; i < net->input.nbNeurons; i++){
-            printf("Input[%i] = ", i);
-            double d;
-            scanf("%lf", &d);
-            net->input.neurons[i].value = d;
-        }
+        printf("Input[0] = ");
+        scanf("%lf", &d1);
+
+        printf("Input[1] = ");
+        scanf("%lf", &d2);
 
         printf("\n");
-        forwo
+        double out = eval_xor(&net, d1, d2);
 
+        printf("Output[0] = %lf\n", out);
 
-
+        printf("Do you want to try again? (y/n) ");
+        char c[1] = "";
+        scanf("%s", c);
+        if(c[0] == 'n'){
+            break;
+        }
+        printf("\n");
     }
 
-
-
-
-    double inputs[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};
-
-
-    printf("Learn Finish\n");
-    save_network(&net, "tests/network/record_xor.data");
-
-    print_net(&net);
-    printf("-------------\n");
-    for(int i = 0; i < 4; i++){
-        printf("\nInput[0] = %f\nInput[1] = %f\n---\n", 
-                                inputs[i][0], inputs[i][1]);
-        forward_prop(&net, inputs[i]);
-        printf("Output[0] = %f\n", net.output.neurons[0].value); 
+    if(argc < 2){
+        printf("Do you want to save network Data? (y/n) ");
+        char c[1] = "";
+        scanf("%s", c);
+        if(c[0] == 'y'){
+            printf("Path to save file : ");
+            char path[2048] = "";
+            scanf("%s", path);
+            save_network(&net, path);
+            printf("File saved successfully in %s\n", path);
+        }
     }
-    printf("Finished\n");
 
     free_network(&net);
     return EXIT_SUCCESS;

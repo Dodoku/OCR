@@ -33,7 +33,7 @@ typedef struct {
 Network init_network(int nbInputs, int nbLayers, int nbHiddens, int nbOutputs);
 void free_network(Network *net);
 
-void forward_prop(Network *net, double *inputs);
+void forward_prop(Network *net);
 void back_prop(Network *net, double *expOutput, double ratio);
 
 Layer* get_layer(Network *net, int pos);

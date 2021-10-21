@@ -1,6 +1,7 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <err.h>
 
 #include "neuralNetwork.h"
@@ -21,37 +22,53 @@ Data init_data(int nbLines, int nbColumns){
     return data;
 }
 
+void print_data(Data *data){
+    for(int i = 0; i < data->nbLines; i++){
+        for(int j = 0; j < data->nbColumns; j++){
+            printf("%f ", data->data[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 Data load_data(char *path){
     Data data;
 
     FILE *fp;
-    
+
     char *c = NULL;
     size_t n;
 
-    int line = 0;
+    int line = 1;
     int column = 0;
 
     fp = fopen(path, "r");
     if (!fp)
         errx(1, "Couldn't open %s\n", path);
 
-    fscanf(fp, "%i %i |", &data.nbLines, &data.nbColumns);
+    double a[4];
+
+    fscanf(fp, "%i %i | %lf %lf %lf %lf", &data.nbLines, &data.nbColumns, 
+            &a[0], &a[1], &a[2], &a[3]);
     data = init_data(data.nbLines, data.nbColumns);
 
+    for (int i = 0; i < 4; i++)
+        data.data[0][i] = a[i];
+
     while(!feof(fp)){
-        if (getdelim(&c, &n, ' ', fp) > 1){
-            data.data[line][column] = atof(c);
-            column++;
-        }else if(getdelim(&c, &n, '\n', fp) > 1){
-            data.data[line][column] = atof(c);
+        if (getline(&c, &n, fp) > 1){
+            char *strToken = strtok (c," ");
+            while (strToken != NULL && strToken[0] != '\n' 
+                                        && strToken[0] != '\0'){
+                printf("%s\n", strToken);
+                data.data[line][column] = atof(strToken);
+                column++;
+                strToken = strtok (NULL, " ");
+            }
             line++;
             column = 0;
         }
     }
-
-    if(c)
-        free(c);
 
     fclose(fp);
     return data;
@@ -72,8 +89,7 @@ void save_data(Data *data, char *path){
                     fprintf(fp, " ");
             }
         }
-        if(i < data->nbLines-1)
-            fprintf(fp, "\n");
+        fprintf(fp, "\n");
     }
 }
 

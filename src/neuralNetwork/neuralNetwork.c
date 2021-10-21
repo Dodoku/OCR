@@ -77,17 +77,14 @@ void free_network(Network *net){
  * Propagation
  */
 
-void forward_prop(Network *net, double *inputs){
-    for(int i = 0; i < net->input.nbNeurons; i++)
-        net->input.neurons[i].value = inputs[i];
-    
+void forward_prop(Network *net){
     for(int i = 0; i <= net->nbHiddens; i++){
         Layer *layer = get_layer(net, i);
         Layer *prev = get_layer(net, i-1);
-        
+
         for(int j = 0; j < layer->nbNeurons; j++){
             Neuron *neu = &layer->neurons[j];
-            
+
             double result = 0;
             for(int k = 0; k < prev->nbNeurons; k++){
                 result += prev->neurons[k].value * neu->weights[k];
@@ -97,6 +94,7 @@ void forward_prop(Network *net, double *inputs){
         }
     }
 }
+
 
 void back_prop(Network *net, double *expOutput, double ratio){
 
@@ -142,9 +140,7 @@ Layer* get_layer(Network *net, int pos){
 }
 
 double rand_num(double start, double end){
-    double ran = (end-start)*((double)rand()/RAND_MAX)+start;
-    printf("%f\n", ran);
-    return ran;
+    return (end-start)*((double)rand()/RAND_MAX)+start;
 }
 double sigmoid(double x){
     return 1.0/(exp(-x)+1.0);
