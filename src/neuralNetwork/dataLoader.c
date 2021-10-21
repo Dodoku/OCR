@@ -60,7 +60,6 @@ Data load_data(char *path){
             char *strToken = strtok (c," ");
             while (strToken != NULL && strToken[0] != '\n' 
                                         && strToken[0] != '\0'){
-                printf("%s\n", strToken);
                 data.data[line][column] = atof(strToken);
                 column++;
                 strToken = strtok (NULL, " ");

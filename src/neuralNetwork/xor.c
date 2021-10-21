@@ -7,7 +7,7 @@
 #define nbHiddens 1
 #define nbNeurons 4
 
-#define validCount 1000
+#define validCount 100
 
 Network init_xor(){
     return init_network(2, nbHiddens, nbNeurons, 1);
@@ -15,7 +15,6 @@ Network init_xor(){
 
 void print_xor(Network *net){
     double inputs[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};
-    double exp[4][1] =    { {0},   {1},   {1},   {0} };
 
     for(int i = 0; i < 4; i++){
         printf("\nInput[0] = %f\nInput[1] = %f\n---\n", 
@@ -36,9 +35,9 @@ int train_xor(Network *net){
             for(int i = 0; i < 4; i++){
                 double out = eval_xor(net, inputs[i][0], inputs[i][1]);
 
-                if(exp[i][0] == 1 && out > 0.95)
+                if(exp[i][0] == 1 && out > 0.90)
                     valid++;
-                else if(exp[i][0] == 0 && out < 0.05)
+                else if(exp[i][0] == 0 && out < 0.10)
                     valid++;
                 else
                     valid = 0;
@@ -47,7 +46,7 @@ int train_xor(Network *net){
         count++;
     }
 
-    return valid;
+    return count;
 }
 
 double eval_xor(Network *net, double a, double b){

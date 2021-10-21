@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
     if(argc >= 2){
         printf("Loading Network WITH Data file...\n");
         net = load_network(argv[1]);
-        printf("Loading Data finished");
+        printf("Loading Data finished\n");
     }else {
         net = init_xor();
         printf("Loading Network WITHOUT Data file...\n");
@@ -31,6 +31,8 @@ int main(int argc, char *argv[]){
 
 
     printf("Network is ready!\n");
+    printf("---------------------\n\n");
+    print_xor(&net);
     printf("---------------------\n\n");
 
     while (1){
