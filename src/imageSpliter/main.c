@@ -4,8 +4,10 @@
 #include <SDL2/SDL_pixels.h>
 
 #include "hough.h"
+#include "../tools/image.h"
 
 int main() {
-    hough_transform();
+    SDL_Surface* image = load("tests/assets/grey.jpeg");
+    hough_transform(image);
     return 0;
 }
