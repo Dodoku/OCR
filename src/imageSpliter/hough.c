@@ -65,7 +65,6 @@ void place_point(int** A, size_t x, size_t y, int max){
     for (double t = 0; t < 180; t++){
         theta = t*(M_PI/180);
         rho = max + x*cos(theta) + y*sin(theta);
-        printf("rho = %f ; theta = %f");
         A[(int)rho][(int)theta] += 1;
     }
 }
@@ -80,18 +79,18 @@ void mapping(SDL_Surface* image, int** A, int mid){
     }
 }
 
-void hough_transform(){
-    SDL_Surface* image = load("tests/assets/grey.jpeg");
-    printf("part1\n");
+void hough_transform(SDL_Surface* image){
+    //init values
     size_t height = image->h;
     size_t width = image->w;
-    int** A = init_matrice(2*(height + width), 180);
-    printf("part2\n");
-    mapping(image, A, height+width);
-    printf("part3\n");
-    SDL_Surface* print = better_print(A, 2*(height + width), 180);
-    printf("part4\n");
+    size_t rhomax = 2*(height+width);
+    int** A = init_matrice(rhomax, 180);
+    //mapping
+    mapping(image, A, rhomax/2);
+    //print
+    SDL_Surface* print = better_print(A, rhomax, 180);
     save(print, "tests/assets/sinus.jpeg");
-    free_matrice(A, 2*(height + width));
+    //free values
+    free_matrice(A, rhomax);
 }
 
