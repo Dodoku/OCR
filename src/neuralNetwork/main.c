@@ -6,21 +6,26 @@
 #include "dataLoader.h"
 #include "xor.h"
 
-void print_net(Network *net){
-    for(int i = 0; i < net->nbHiddens; i++){
-        for(int j = 0; j < net->hiddens[i].nbNeurons; j++){
-            for(int k = 0; k < net->hiddens[i].neurons[j].nbWeights; k++){
-                printf("%f ", net->hiddens[i].neurons[j].weights[k]);
-            }
-            printf("\n");
-        }
-        printf("----");
-    }
-}
-
-int main(){
+int main(int argc, char *argv[]){
     srand( time( NULL ) );
-    
+
+    if(argc <= 2){
+        printf("Usage: ./neuralNetwork <load/train> <path>")
+    }
+
+    Network net;
+
+    if(argv[1] == "load"){
+        printf("Loading Network with Data file...\n");
+        net = load_network(args[2]);
+        printf("Loading Finished\n");
+    }else if(argv[1] == "train"){
+        printf("Starting the training of network...\n");
+        net = train_xor();
+        printf("Train Finished\n");
+    }
+
+
     double inputs[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};
 
     Network net = init_xor();
