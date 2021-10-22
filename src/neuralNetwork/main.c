@@ -4,7 +4,10 @@
 
 #include "neuralNetwork.h"
 #include "dataLoader.h"
+#include "../tools/image.h"
+
 #include "xor.h"
+#include "number.h"
 
 
 /**
@@ -12,7 +15,37 @@
  */
 
 
-int main(int argc, char *argv[]){
+int main (int argc, char *argv[]){
+    srand( time( NULL ) );
+
+    Network net;
+
+    net = init_number();
+    
+    train_number(&net);
+
+    int nb = eval_number(&net, load("tests/network/numbers/4.jpg"));
+    printf("%i\n", nb);
+
+    double exp[10];
+    for(int k = 0; k < 10; k++){
+        if(k == 4){
+            exp[k] = 1.0;
+        }else {
+            exp[k] = 0.0;
+        }
+    }
+
+    back_prop(&net, exp, 1);
+
+    nb = eval_number(&net, load("tests/network/numbers/5.jpg"));
+    printf("%i\n", nb);
+
+    nb = eval_number(&net, load("tests/network/numbers/6.jpg"));
+    printf("%i\n", nb);
+}
+
+/*int main(int argc, char *argv[]){
     srand( time( NULL ) );
 
     Network net;
@@ -74,4 +107,4 @@ int main(int argc, char *argv[]){
 
     free_network(&net);
     return EXIT_SUCCESS;
-}
+}*/

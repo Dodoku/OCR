@@ -31,7 +31,7 @@ int train_xor(Network *net){
     int count = 0;
     int valid = 0;
 
-    while(valid < validCount && count < 100000){
+    while(valid < validCount && count < 10000){
             for(int i = 0; i < 4; i++){
                 double out = eval_xor(net, inputs[i][0], inputs[i][1]);
 
