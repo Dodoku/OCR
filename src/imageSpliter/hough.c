@@ -31,29 +31,6 @@ void free_matrice(int** A, size_t height){
 	free(A);
 }
 
-void print_matrice(int**A, size_t height, size_t width){
-	for (size_t i = 0; i < height; i++){
-		printf("| ");
-        for (size_t j = 0; j < width ; j++){
-			printf("%i | ",A[i][j]);
-        }
-        printf("\n");
-	}
-}
-
-SDL_Surface* better_print(int** A, size_t height, size_t width){
-    SDL_Surface* print = create_empty(width, height);
-    for (size_t i = 0; i < height; i++){
-        for (size_t j = 0; j < width; j++){
-            int color = A[j][i];
-            if (color>255)
-                color = 255;
-            set_pixel(print, j, i, to_color(color, color, color, 255));
-        }
-    }
-    return print;
-}
-
 void place_point(int** A, size_t x, size_t y, int max){
     double rho, theta;
     for (size_t t = 0; t < 360; t++){
@@ -71,6 +48,30 @@ void mapping(SDL_Surface* image, int** A, int mid){
                 place_point(A, i, j, mid);
         }
     }
+}
+
+void hough_trace(SDL_Surface* output, double x, double y, double rhomax){
+    double rho, theta;
+    for(size_t t = 0; t < 3600; t++){
+        theta = ((double) t/10)*(M_PI/180);
+        rho = (rhomax/2) + x*cos(theta) + y*sin(theta);
+        Uint8 value = (get_pixel(output, t, (size_t) rho)).r;
+        if(value > 0)
+            set_pixel(output, t, (size_t) rho, to_color(value-1,value-1,value-1,255));
+    }
+}
+
+SDL_Surface* hough_mapping(SDL_Surface* input){
+    size_t height = input->h, width = input->w;
+    size_t rhomax = 2*(height+width);
+    SDL_Surface* output = create_empty(3600, rhomax);
+    for(size_t i = 0; i < height; i++){
+        for(size_t j = 0; j < width; j++){
+            if(get_pixel(input, i, j).r > 0)
+                hough_trace(output, (double) i, (double) j, (double) rhomax);
+        }
+    }
+    return output;
 }
 
 void hough_transform(SDL_Surface* image){
@@ -94,8 +95,8 @@ SDL_Surface* function_print(){
     for (size_t t = 0; t < 3600; t++){
         theta = (((double)t)/10)*(M_PI/180);
         rho = 2000.0 + 1000.0*cos(theta) + 1000.0*sin(theta);
-	printf("rho = %f and theta = %zu\n",rho,t);
-	set_pixel(print, t, (int)rho, to_color(0,0,0,255));
+        printf("rho = %f and theta = %zu\n",rho,t);
+        set_pixel(print, t, (int)rho, to_color(0,0,0,255));
     }
     return print;
 }
