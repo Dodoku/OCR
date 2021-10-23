@@ -1,7 +1,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 #include "wall_draw.h"
-#include "../imageProcess/image.h"
+#include "../tools/image.h"
 
 /*
  * Draw the digit for each number in the sudoku
