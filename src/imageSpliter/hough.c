@@ -41,11 +41,6 @@ void print_matrice(int**A, size_t height, size_t width){
 	}
 }
 
-/*
-SDL_Surface* render_line(SDL_Surface image){
-}
-*/
-
 SDL_Surface* better_print(int** A, size_t height, size_t width){
     SDL_Surface* print = create_empty(width, height);
     for (size_t i = 0; i < height; i++){
@@ -60,9 +55,8 @@ SDL_Surface* better_print(int** A, size_t height, size_t width){
 }
 
 void place_point(int** A, size_t x, size_t y, int max){
-    double rho;
-	double theta;
-    for (size_t t = 0; t < 180; t++){
+    double rho, theta;
+    for (size_t t = 0; t < 360; t++){
         theta = t*(M_PI/180);
         rho = max + x*cos(theta) + y*sin(theta);
         A[(int)rho][t] += 1;
@@ -81,16 +75,15 @@ void mapping(SDL_Surface* image, int** A, int mid){
 
 void hough_transform(SDL_Surface* image){
     //init values
-    size_t height = image->h;
-    size_t width = image->w;
+    size_t height = image->h, width = image->w;
     size_t rhomax = 2*(height+width);
-    int** A = init_matrice(rhomax, 180);
+    int** A = init_matrice(rhomax, 360);
     //mapping
     mapping(image, A, rhomax/2);
     //print
-    SDL_Surface* print = better_print(A, rhomax, 180);
-    save(print, "tests/assets/sinus.jpeg");
+    //SDL_Surface* print = better_print(A, rhomax, 180);
+    //save(print, "tests/assets/sinus.jpeg");
     //free values
+
     free_matrice(A, rhomax);
 }
-
