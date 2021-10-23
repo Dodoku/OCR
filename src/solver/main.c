@@ -19,6 +19,6 @@ int main(int argc, char **argv) {
     strcat(out, ".out");
     save_grid(out, grid);
 
-    printf("Sudoku solved and saved to \"%s\"\n", out);
+    printf("Sudoku solved and saved as \"%s\"\n", out);
     return EXIT_SUCCESS;
 }
