@@ -47,18 +47,29 @@ int max(int** A, size_t rhomax){
     return max;
 }
 
+void hough_lines(SDL_Surface* input, size_t A, size_t rhomax, size_t threshold){
+    double rho;
+    for(size_t i = 0; i < tmax; i++){
+        for(size_t j = 0; j < rhomax; j++){
+            if(A[i][j] > threshold){
+                rho = ((double) j) - ((double)rhomax)/2;
+                line_trace(input, (double) i, rho);
+            }
+        }
+    }
+}
+
 void line_trace(SDL_Surface* input, double theta, double rho){
-    size_t height = input->h, width = input->w;
+    size_t height = input->h, width = input->w;)
     double y;
     size_t i, j;
     for (double x = 0; x < width; x++){
         y = (rho - x*cos(theta))/sin(theta);
-	if (x>0 && y>0){
+        if (x>0 && y>0){
             i = (size_t) x, j = (size_t) y;
-	    if (i < height && j < width){
+            if (i < height && j < width)
                 set_pixel(input, i, j, to_color(255,0,0,255));
-	    }
-	}
+        }
     }
 }
 
