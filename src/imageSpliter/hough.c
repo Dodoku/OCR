@@ -81,9 +81,21 @@ void hough_transform(SDL_Surface* image){
     //mapping
     mapping(image, A, rhomax/2);
     //print
-    //SDL_Surface* print = better_print(A, rhomax, 180);
-    //save(print, "tests/assets/sinus.jpeg");
+    SDL_Surface* print = better_print(A, rhomax, 180);
+    save(print, "tests/assets/sinus.jpeg");
     //free values
 
     free_matrice(A, rhomax);
+}
+
+SDL_Surface* function_print(){
+    SDL_Surface* print = create_empty(3600,4000);
+    double rho, theta;
+    for (size_t t = 0; t < 3600; t++){
+        theta = (((double)t)/10)*(M_PI/180);
+        rho = 2000.0 + 1000.0*cos(theta) + 1000.0*sin(theta);
+	printf("rho = %f and theta = %zu\n",rho,t);
+	set_pixel(print, t, (int)rho, to_color(0,0,0,255));
+    }
+    return print;
 }

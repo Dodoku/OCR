@@ -7,11 +7,18 @@
 #include "../tools/image.h"
 
 int main() {
+    SDL_Surface* image = function_print();
+    save(image, "tests/assets/tests.jpeg");
+    return 0;
+}
+
+/*
+int main() {
     SDL_Surface* image = load("tests/assets/imageGrey_01.jpeg");
     hough_transform(image);    
     return 0;
 }
-/*
+
 void test_matrix(){
     int** A = init_matrice(10,8);
     for (size_t i = 0; i < 10; i++)

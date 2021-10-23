@@ -17,4 +17,6 @@ void mapping(SDL_Surface* image, int** A, int mid);
 
 void hough_transform();
 
+SDL_Surface* function_print();
+
 #endif
