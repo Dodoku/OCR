@@ -1,7 +1,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
+#include <err.h>
 #include "wall_draw.h"
 #include "../tools/image.h"
+
 
 /*
  * Draw the digit for each number in the sudoku
@@ -43,6 +45,7 @@ void display_digit(SDL_Surface *image, int x, int y, int n) {
             number = load("src/imageGenerator/assets/nine.jpg");
             break;
         default:
+            return;
             break;
     }
     for (int i = 0; i < 100; i++) {
@@ -52,17 +55,44 @@ void display_digit(SDL_Surface *image, int x, int y, int n) {
     }
 }
 
+void init_grid(char *path, int *grid) {
+    FILE *fp;
+    char c;
+
+    fp = fopen(path, "r");
+    if (!fp)
+        errx(1, "Couldn't open %s\n", path);
+
+    int i = 0;
+
+    while ((c = fgetc(fp)) != EOF) {
+        if (c == '.')
+            *(grid + i) = 0;
+        else if (c > '0' && c <= '9')
+            *(grid + i) = c - '0';
+        else if (c != '\n' && c != '\0' && c != ' ')
+            errx(1, "File doesn't respect the format");
+        else
+            continue;
+        i++;
+    }
+    fclose(fp);
+}
+
+
 /*
  * Draw the digit for each number in the sudoku
- * @param sudoku (int[]) : a 81 int array, that contains the sudoku data
- * @param path (char[]*) : a string that contains the path to save the generated
+ * @param sudoku (int[]) : a path to a file that contains the sudoku data
+ * @param path (char*) : a string that contains the path to save the generated
  * picture
  * @authur Nicolas Prevost
  */
 
-void generate_digit_picture(int sudoku[], char *path[]) {
-    SDL_Surface *image = create_empty(993, 993);
+void generate_digit_picture(char* sudoku, char* path) {
 
+    int grid[81] = {0};
+    init_grid(sudoku, grid);
+    SDL_Surface *image = create_empty(993, 993);
     horizontal_wall(image, 0, 12);
     vertical_wall(image, 0, 12, 12);
 
@@ -70,9 +100,8 @@ void generate_digit_picture(int sudoku[], char *path[]) {
     int y = 12;
     int horizontal = 0;
     int vertical = 0;
-
     for (int index = 0; index < 81; index++) {
-        display_digit(image, x, y, sudoku[index]);
+        display_digit(image, x, y, grid[index]);
         horizontal++;
 
         if (horizontal == 3 || horizontal == 6 || horizontal == 9) {
