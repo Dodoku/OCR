@@ -70,6 +70,7 @@ SDL_Surface* hough_mapping(SDL_Surface* input){
             if(get_pixel(input, i, j).r > 0)
                 hough_trace(output, (double) i, (double) j, (double) rhomax);
         }
+	printf("%zu",i);
     }
     return output;
 }
@@ -82,8 +83,8 @@ void hough_transform(SDL_Surface* image){
     //mapping
     mapping(image, A, rhomax/2);
     //print
-    SDL_Surface* print = better_print(A, rhomax, 180);
-    save(print, "tests/assets/sinus.jpeg");
+    //SDL_Surface* print = better_print(A, rhomax, 180);
+    //save(print, "tests/assets/sinus.jpeg");
     //free values
 
     free_matrice(A, rhomax);

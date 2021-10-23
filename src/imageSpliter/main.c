@@ -7,8 +7,9 @@
 #include "../tools/image.h"
 
 int main() {
-    SDL_Surface* image = function_print();
-    save(image, "tests/assets/tests.jpeg");
+    SDL_Surface* input = load("tests/assets/line.png");
+    SDL_Surface* image = hough_mapping(input);
+    save(image, "tests/assets/tests2.jpeg");
     return 0;
 }
 
