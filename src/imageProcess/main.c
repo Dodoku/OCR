@@ -16,9 +16,10 @@ int main() {
         s[22] = '0'+i;
         s1[16] = '0'+i;
         SDL_Surface* image = load(s);
-        //image = to_black_and_white(image);
-        //image = noise_reduction(image,0.5);
-        image = contrast(image,0.5);
+        printf("je suis dylan et des fonctions a la con\n" );
+        image = to_greyscale(image);
+        image = gaussian_blur(image,3);
+
         save(image, s1);
     }
 
