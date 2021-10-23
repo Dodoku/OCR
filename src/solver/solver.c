@@ -55,9 +55,7 @@ void save_grid(char *path, int *grid) {
 
             fprintf(fp, "%i", *(grid + y * sudoSize + x));
         }
-
-        if (y < sudoSize - 1)
-            fputs("\n", fp);
+        fputs("\n", fp);
     }
 
     fclose(fp);
