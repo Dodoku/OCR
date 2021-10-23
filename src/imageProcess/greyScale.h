@@ -13,4 +13,12 @@ SDL_Color black_and_white(Uint32 value, Uint32 average);
 
 Uint32 get_average(SDL_Surface *image);
 
+void otsu_transform(SDL_Surface* image);
+
+int otsu_threshold(int* A, int N);
+
+void otsu_histogram(SDL_Surface* image, int* A);
+
+SDL_Surface* otsu(SDL_Surface* input);
+
 #endif

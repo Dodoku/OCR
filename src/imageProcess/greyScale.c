@@ -6,11 +6,8 @@
 #include "../tools/image.h"
 
 SDL_Color greyscale(SDL_Color color) {
-    SDL_Color grey;
     Uint32 value = (color.r + color.g + color.b)/3;
-    grey.r, grey.g, grey.b = value;
-    grey.a = color.a;
-    return grey;
+    return to_color(value, value, value, color.a);
 }
 
 SDL_Color black_and_white(Uint32 value, Uint32 average) {
@@ -68,24 +65,24 @@ SDL_Surface* to_black_and_white(SDL_Surface *image) {
 
 void otsu_histogram(SDL_Surface* image, int* A){
     size_t height = image->h, width = image->w;
-    for(){
-        for(){
+    for(size_t i = 0; i < height; i++){
+        for(size_t j = 0; j < width; j++){
             SDL_Color color = get_pixel(image, i, j);
             A[color.r] += 1;
         }
     }
 }
 
-int otsu_threshold(int* A){
+int otsu_threshold(int* A, int N){
     int threshold = 0, var_max = 0, sum = 0, sumB = 0;
     int q1 = 0, q2 = 0, u1 = 0, u2 = 0, u, o;
     for(size_t i = 0; i <= 255; i++)
         sum += i * A[i];
     for(size_t t = 0; t <= 255; t++){
         q1 += A[t];
-        if (q == 0)
-            continue
-        q2 = height * width - q1;
+        if (q1 == 0)
+            continue;
+        q2 = N - q1;
         sumB += t*A[t];
         u1 = sumB/q1;
         u2 = (sum - sumB)/q2;
@@ -100,9 +97,8 @@ int otsu_threshold(int* A){
 }
 
 void otsu_transform(SDL_Surface* image){
-    const SDL_Color black, white;
-    black.a = white.a = white.r = white.g = white.b = 255;
-    black.r = black.g = black.b = ;
+    const SDL_Color black = to_color(0,0,0,255);
+    const SDL_Color white = to_color(255,255,255,255);
 
     size_t height = image->h, width = image->w;
     int A[256];
@@ -110,7 +106,7 @@ void otsu_transform(SDL_Surface* image){
         A[i] = 0;
     
     otsu_histogram(image, A);
-    int threshold = otsu_threshold(A);
+    int threshold = otsu_threshold(A, height*width);
     for(size_t i = 0; i < height; i++){
         for(size_t j = 0; j < width; j++){
             if(get_pixel(image, i, j).r > threshold)
@@ -121,7 +117,7 @@ void otsu_transform(SDL_Surface* image){
     }
 }
 
-sDL_Surface* otsu(SDL_Surface* input){
+SDL_Surface* otsu(SDL_Surface* input){
     SDL_Surface* output= to_greyscale(input);
     otsu_transform(output);
     return output;

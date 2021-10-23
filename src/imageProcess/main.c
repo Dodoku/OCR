@@ -10,7 +10,7 @@
 
 int main() {
     SDL_Surface* image = load("tests/assets/image_01.jpeg");
-    SDL_Surface* grey = to_black_and_white(image);
+    SDL_Surface* grey = otsu(image);
     save(grey, "tests/assets/grey.jpeg");
     return 0;
 }
