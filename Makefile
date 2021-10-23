@@ -42,10 +42,12 @@ format:
 #
 # Builds
 #
-ocr: $(OBJ)
-	@echo "Linking OCR..."
-	@$(CC) -o $@ $^ $(LDFLAGS)
-	@echo "Build Finished"
+ocr: module/imageProcess module/imageSpliter module/neuralNetwork module/solver module/imageGenerator
+
+#ocr: $(OBJ)
+#	@echo "Linking OCR..."
+#	@$(CC) -o $@ $^ $(LDFLAGS)
+#	@echo "Build Finished"
 
 #
 #Modules
