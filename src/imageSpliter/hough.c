@@ -32,17 +32,19 @@ void free_matrice(int** A, size_t height){
 	free(A);
 }
 
-void max(int** A, size_t* x, size_t* y, size_t rhomax){
+int max(int** A, size_t rhomax){
     int max = 0;
+    size_t x = 0, y = 0;
     for(size_t i = 0; i < tmax; i++){
         for(size_t j = 0; j < rhomax; j++){
             if(A[i][j] > max){
-                *x = i;
-                *y = j;
+                x = i;
+                y = j;
                 max = A[i][j];
             }
         }
     }
+    return max;
 }
 
 void line_trace(SDL_Surface* input, double theta, double rho){
@@ -51,13 +53,10 @@ void line_trace(SDL_Surface* input, double theta, double rho){
     size_t i, j;
     for (double x = 0; x < width; x++){
         y = (rho - x*cos(theta))/sin(theta);
-	y =-y;
-	printf("y = %f\n", y);
 	if (x>0 && y>0){
             i = (size_t) x, j = (size_t) y;
 	    if (i < height && j < width){
                 set_pixel(input, i, j, to_color(255,0,0,255));
-		printf("hey!\n");
 	    }
 	}
     }
@@ -86,10 +85,7 @@ SDL_Surface* hough_transform(SDL_Surface* input){
 	printf("line : %zu\n",i);
     }
 
-    size_t x = 0, y = 0;
-    size_t *i = &x, *j = &y;
-    max(A, i, j, rhomax);
-    y -= rhomax/2;
+    size_t threshold = (max(A, rhomax))/2;
     line_trace(input, (double) x,(double) y);
     free_matrice(A,tmax);
     return input;

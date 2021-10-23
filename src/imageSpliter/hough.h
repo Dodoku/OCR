@@ -7,7 +7,7 @@ int** init_matrice(size_t height, size_t width);
 
 void free_matrice(int** A, size_t height);
 
-void max(int** A, size_t* x, size_t* y, size_t rhomax);
+int max(int** A, size_t rhomax);
 
 void line_trace(SDL_Surface* input, double theta, double rho, double rhomax);
 
