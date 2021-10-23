@@ -15,7 +15,7 @@
  */
 
 
-int main (int argc, char *argv[]){
+/*int main (int argc, char *argv[]){
     srand( time( NULL ) );
 
     Network net;
@@ -43,9 +43,9 @@ int main (int argc, char *argv[]){
 
     nb = eval_number(&net, load("tests/network/numbers/6.jpg"));
     printf("%i\n", nb);
-}
+}*/
 
-/*int main(int argc, char *argv[]){
+int main(int argc, char *argv[]){
     srand( time( NULL ) );
 
     Network net;
@@ -107,4 +107,4 @@ int main (int argc, char *argv[]){
 
     free_network(&net);
     return EXIT_SUCCESS;
-}*/
+}

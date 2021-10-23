@@ -5,7 +5,7 @@
 #include "xor.h"
 
 #define nbHiddens 1
-#define nbNeurons 4
+#define nbNeurons 6
 
 #define validCount 100
 
@@ -35,9 +35,9 @@ int train_xor(Network *net){
             for(int i = 0; i < 4; i++){
                 double out = eval_xor(net, inputs[i][0], inputs[i][1]);
 
-                if(exp[i][0] == 1 && out > 0.90)
+                if(exp[i][0] == 1 && out > 0.95)
                     valid++;
-                else if(exp[i][0] == 0 && out < 0.10)
+                else if(exp[i][0] == 0 && out < 0.05)
                     valid++;
                 else
                     valid = 0;
