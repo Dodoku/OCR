@@ -39,7 +39,7 @@ Data load_data(char *path){
     char *c = NULL;
     size_t n;
 
-    int line = 1;
+    int line = 0;
     int column = 0;
 
     fp = fopen(path, "r");
