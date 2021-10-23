@@ -66,28 +66,6 @@ SDL_Surface* to_black_and_white(SDL_Surface *image) {
     return result;
 }
 
-void otsu_transform(SDL_Surface* image){
-    const SDL_Color black, white;
-    black.a = white.a = white.r = white.g = white.b = 255;
-    black.r = black.g = black.b = ;
-
-    size_t height = image->h, width = image->w;
-    int A[256];
-    for(size_t i = 0; i < 256; i++)
-        A[i] = 0;
-    
-    otsu_histogram(image, A);
-    int threshold = otsu_threshold(A);
-    for(size_t i = 0; i < height; i++){
-        for(size_t j = 0; j < width; j++){
-            if(get_pixel(image, i, j).r > threshold)
-                set_pixel(image, i, j, black);
-            else
-                set_pixel(image, i, j, white);
-        }
-    }
-}
-
 void otsu_histogram(SDL_Surface* image, int* A){
     size_t height = image->h, width = image->w;
     for(){
@@ -121,7 +99,29 @@ int otsu_threshold(int* A){
     return threshold;
 }
 
-SDL_Surface* otsu(SDL_Surface* input){
+void otsu_transform(SDL_Surface* image){
+    const SDL_Color black, white;
+    black.a = white.a = white.r = white.g = white.b = 255;
+    black.r = black.g = black.b = ;
+
+    size_t height = image->h, width = image->w;
+    int A[256];
+    for(size_t i = 0; i < 256; i++)
+        A[i] = 0;
+    
+    otsu_histogram(image, A);
+    int threshold = otsu_threshold(A);
+    for(size_t i = 0; i < height; i++){
+        for(size_t j = 0; j < width; j++){
+            if(get_pixel(image, i, j).r > threshold)
+                set_pixel(image, i, j, black);
+            else
+                set_pixel(image, i, j, white);
+        }
+    }
+}
+
+sDL_Surface* otsu(SDL_Surface* input){
     SDL_Surface* output= to_greyscale(input);
     otsu_transform(output);
     return output;
