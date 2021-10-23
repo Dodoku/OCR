@@ -20,7 +20,7 @@ static void init_neuron(Neuron *neuron, int nbPrevNeurons){
     neuron->delta = 0;
 
     for(int i = 0; i < nbPrevNeurons; i++)
-        neuron->weights[i] = rand_num(0, 1);
+        neuron->weights[i] = rand_num(-1, 1);
 }
 
 static void init_layer(Layer *layer, int nbNeurons, int nbPrevNeurons){
@@ -95,35 +95,40 @@ void forward_prop(Network *net){
     }
 }
 
-
-void back_prop(Network *net, double *expOutput, double ratio){
-
+static void calc_delta(Network *net, double *expOutput){
     for(int i = 0; i < net->output.nbNeurons; i++){
         Neuron *neu = &net->output.neurons[i];
-        Layer *prev = get_layer(net, (net->nbHiddens)-1);
-
-        neu->delta = expOutput[i] - neu->value; //Delta
-
-        for(int j = 0; j < prev->nbNeurons; j++)
-            neu->weights[j] = neu->weights[j] + ratio * 
-                                    prev->neurons[j].value * neu->delta;
+        neu->delta = expOutput[i] - neu->value;
     }
 
     for(int i = net->nbHiddens-1; i >= 0; i--){
+        Layer *next = get_layer(net, i+1);
         for(int j = 0; j < net->hiddens[i].nbNeurons; j++){
             Neuron *neu = &net->hiddens[i].neurons[j];
-            Layer *prev = get_layer(net, i-1);
-            Layer *next = get_layer(net, i+1);
 
-            int sum = 0;
+            double sum = 0;
             for(int k = 0; k < next->nbNeurons; k++)
                 sum += next->neurons[k].weights[j] * next->neurons[k].delta;
 
-            neu->delta = sigmoidPrime(neu->value) * sum; //Delta
+            neu->delta = sigmoidPrime(neu->value) * sum;
+        }
+    }
+}
 
-            for(int k = 0; k < prev->nbNeurons; k++)
-                neu->weights[k] = neu->weights[k] + ratio * 
-                                    prev->neurons[k].value * neu->delta;
+
+void back_prop(Network *net, double *expOutput, double rate){
+
+    calc_delta(net, expOutput);
+
+    for(int i = 0; i <= net->nbHiddens; i++){
+        Layer *layer = get_layer(net, i);
+        Layer *prev = get_layer(net, i-1);
+
+        for(int j = 0; j < layer->nbNeurons; j++){
+            Neuron *neu = &layer->neurons[j];
+            for(int k = 0; k < prev->nbNeurons; k++){
+                neu->weights[k] += rate * prev->neurons[k].value * neu->delta;
+            }
         }
     }
 }
@@ -143,9 +148,9 @@ double rand_num(double start, double end){
     return (end-start)*((double)rand()/RAND_MAX)+start;
 }
 double sigmoid(double x){
-    return 1.0/(exp(-x)+1.0);
+    return (double)1.0/(exp(-x)+(double)1.0);
 }
 
 double sigmoidPrime(double x){
-    return x*(1.0-x);
+    return x*((double)1.0-x);
 }
