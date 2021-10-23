@@ -50,14 +50,39 @@ void mapping(SDL_Surface* image, int** A, int mid){
     }
 }
 
+SDL_Color color_flex(SDL_Color input){
+    SDL_Color output;
+    if(input.r > 5){
+	output.a = input.a;
+	output.r = input.r-1;
+	output.g = input.g;
+	output.b = input.b;
+	return output;
+    }
+    if(input.g > 5){
+	output.a = input.a;
+	output.r = 0;
+	output.g = input.g-1;
+	output.b = input.b;
+	return output;
+    }
+    if(input.b > 5){
+	output.a = input.a;
+	output.r = 0;
+	output.g = 0;
+	output.b = input.b-1;
+	return output;
+    }
+    return input;
+}
+
 void hough_trace(SDL_Surface* output, double x, double y, double rhomax){
     double rho, theta;
     for(size_t t = 0; t < 3600; t++){
         theta = ((double) t/10)*(M_PI/180);
         rho = (rhomax/2) + x*cos(theta) + y*sin(theta);
-        Uint8 value = (get_pixel(output, t, (size_t) rho)).r;
-        if(value > 0)
-            set_pixel(output, t, (size_t) rho, to_color(value-1,value-1,value-1,255));
+        SDL_Color pixel = color_flex(get_pixel(output, t, (size_t) rho));
+        set_pixel(output, t, (size_t) rho, pixel);
     }
 }
 
@@ -70,7 +95,7 @@ SDL_Surface* hough_mapping(SDL_Surface* input){
             if(get_pixel(input, i, j).r > 0)
                 hough_trace(output, (double) i, (double) j, (double) rhomax);
         }
-	printf("%zu",i);
+	printf("%zu\n",i);
     }
     return output;
 }

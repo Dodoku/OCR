@@ -11,6 +11,8 @@ void place_point(int** A, size_t x, size_t y, int max);
 
 void mapping(SDL_Surface* image, int** A, int mid);
 
+SDL_Color color_flex(SDL_Color input);
+
 void hough_transform();
 
 void hough_trace(SDL_Surface* output, double x, double y, double rhomax);
