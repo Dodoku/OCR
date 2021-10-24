@@ -37,7 +37,24 @@ SDL_Surface* gaussian_blur(SDL_Surface* image, int n){
         }
         image = new_image;
     }
+    return image;
+}
 
-
+SDL_Surface* simple_blur(SDL_Surface* image, int n){
+    SDL_Surface* new_image = create_empty(image->w, image->h);
+    for(int o=0;o<n;o++){
+        for(int i=1;i<image->w-1;i++){
+            for(int j=1;j<image->h-1;j++){
+                int new_pixel = 0;
+                for(int k=0;k<3;k++){
+                    for(int l=0;l<3;l++){
+                        new_pixel += get_pixel(image, i-1+k, j-1+l).r;
+                    }
+                }
+                set_pixel(new_image, i, j, to_color(new_pixel/9,new_pixel/9, new_pixel/9, new_pixel/9));
+            }
+        }
+        image = new_image;
+    }
     return image;
 }

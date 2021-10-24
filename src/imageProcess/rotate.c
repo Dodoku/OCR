@@ -6,11 +6,11 @@
 /*
  * What the function does
  * @param image (SDL_Surface*) : the picture to rotate
- * @param angle (int) : gives the angle to rotate
+ * @param angle (int) : gives the angle to rotate in radian
  * @return (SDL_Surface*) : return the rotated picture
  * @authur Nicolas Prevost
  */
-SDL_Surface *rotate(SDL_Surface *image, int angle) {
+SDL_Surface *rotate(SDL_Surface *image, double angle) {
     int width = image->w;
     int height = image->h;
 
