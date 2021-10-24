@@ -22,7 +22,7 @@ To apply the filter on all images you can use `./build/imageProcess - -`
 ## Image Splitting
 First you have to build the executable of the module with `make module/imageSpliter`
 
-Pour appliquer le découpage de l'image il suffit d'utiliser la commande `./build/imageSpliter [path]`
+to split a picture, use `./build/imageSpliter [path]`
 ## Neural Network
 First you have to build the executable of the module with `make module/neuralNetwork`
 ### XOR Network
