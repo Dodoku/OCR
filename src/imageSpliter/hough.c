@@ -9,11 +9,11 @@
 
 #define tmax 1800
 
-int** init_matrice(size_t height, size_t width){
-	int **A = malloc(sizeof(int*[height]));
+long** init_matrice(size_t height, size_t width){
+	long **A = malloc(sizeof(long*[height]));
     
     for (size_t i = 0; i < height; i++){
-        A[i] = malloc(sizeof(int[width]));
+        A[i] = malloc(sizeof(long[width]));
     }
 
 	for (size_t i = 0; i < height; i++){
@@ -25,15 +25,15 @@ int** init_matrice(size_t height, size_t width){
 	return A;
 }
 
-void free_matrice(int** A, size_t height){
+void free_matrice(long** A, size_t height){
 	for (size_t i = 0; i < height; i++)
 		free(A[i]);
 
 	free(A);
 }
 
-int max(int** A, size_t rhomax){
-    int max = 0;
+long max(long** A, size_t rhomax){
+    long max = 0;
     for(size_t i = 0; i < tmax; i++){
         for(size_t j = 0; j < rhomax; j++){
             if(A[i][j] > max)
@@ -57,7 +57,7 @@ void line_trace(SDL_Surface* input, double theta, double rho){
     }
 }
 
-void hough_lines(SDL_Surface* input, int** A, size_t rhomax, int threshold){
+void hough_lines(SDL_Surface* input, long** A, size_t rhomax, long threshold){
     double rho;
     for(size_t i = 0; i < tmax; i++){
         for(size_t j = 0; j < rhomax; j++){
@@ -70,20 +70,20 @@ void hough_lines(SDL_Surface* input, int** A, size_t rhomax, int threshold){
     }
 }
 
-void hough_trace(int** A, double x, double y, double rhomax){
+void hough_trace(long** A, double x, double y, double rhomax){
     double rho, theta;
     for(size_t t = 0; t < tmax; t++){
         theta = ((double) t/10)*(M_PI/180);
         rho = (rhomax/2) + x*cos(theta) + y*sin(theta);
-	size_t r = (size_t) rho;
-	A[t][r] += 1;
+		size_t r = (size_t) rho;
+		A[t][r] += 1;
     }
 }
 
 SDL_Surface* hough_transform(SDL_Surface* input){
     size_t height = input->h, width = input->w;
     size_t rhomax = 2*(height+width);
-    int** A = init_matrice(tmax, rhomax);
+    long** A = init_matrice(tmax, rhomax);
     for(size_t i = 0; i < height; i++){
         for(size_t j = 0; j < width; j++){
             if(get_pixel(input, i, j).r > 0)
@@ -91,7 +91,7 @@ SDL_Surface* hough_transform(SDL_Surface* input){
         }
     }
 
-    int threshold = (max(A, rhomax))/2;
+    long threshold = (max(A, rhomax))/2;
     hough_lines(input, A, rhomax, threshold);
     free_matrice(A,tmax);
     return input;
