@@ -9,7 +9,7 @@ void free_matrice(int** A, size_t height);
 
 int max(int** A, size_t rhomax);
 
-void hough_lines(SDL_Surface* input, size_t A, size_t rhomax, size_t threshold);
+SDL_Surface* hough_print(int**A, size_t rhomax);
 
 void line_trace(SDL_Surface* input, double theta, double rho, double rhomax);
 

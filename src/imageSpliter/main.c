@@ -6,10 +6,15 @@
 #include "hough.h"
 #include "../tools/image.h"
 
-int main() {
-    SDL_Surface* input = load("tests/assets/line.png");
+int main(int argc, char *argv[]) {
+    if(argc != 3){
+	printf("failed to split, use the architecture below :\n");
+	printf("./build/imageSpliter load_path save_path\n");
+	return 1;
+    }
+    SDL_Surface* input = load(argv[1]);
     SDL_Surface* output = hough_transform(input);
-    save(output, "tests/assets/tests3.jpeg");
+    save(output, argv[2]);
     return 0;
 }
 
