@@ -12,12 +12,12 @@ To apply a rotation to an image you can use the command `./build/imageProcess ro
 To apply a filter to an image you can use the command `./build/imageProcess [filter] [path-src] [path-dest]`
 Filter :
 * `greyscale` : transforms the image into black and white 
-* `blur` : blur the image
+* `blur` + `n` : blur the image n times
 * `otsu` : highlights the forumes in the image with binarization
 
 To apply all filters you can use filter `all`
 
-To apply the filter on all images you can use `-` in path
+To apply the filter on all images you can use `./build/imageProcess - -`
 
 ## Image Splitting
 First you have to build the executable of the module with `make module/imageSpliter`
