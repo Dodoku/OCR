@@ -31,9 +31,15 @@ int train_xor(Network *net){
     int count = 0;
     int valid = 0;
 
-    while(valid < validCount && count < 10000){
-            for(int i = 0; i < 4; i++){
+    while(valid <= validCount && count < 10000){
+            for(int i = 0; valid <= validCount && i < 4; i++){
                 double out = eval_xor(net, inputs[i][0], inputs[i][1]);
+
+                double errorRate = out - exp[i][0];
+                if(errorRate < 0)
+                    errorRate = -errorRate;
+                printf("Error rate : %f (valid results %i/%i)\n", errorRate,
+                                                     valid, validCount);
 
                 if(exp[i][0] == 1 && out > 0.95)
                     valid++;
