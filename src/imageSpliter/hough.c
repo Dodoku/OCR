@@ -61,7 +61,7 @@ void hough_lines(SDL_Surface* input, int** A, size_t rhomax, int threshold){
     double rho;
     for(size_t i = 0; i < tmax; i++){
         for(size_t j = 0; j < rhomax; j++){
-	    printf("i = %zu ; j = %zu\n ; tmax = %u ; rhomax = %zu\n; val = %i\n", i, j,tmax,rhomax, A[i][j]);
+	    //printf("i = %zu ; j = %zu\n ; tmax = %u ; rhomax = %zu\n; val = %i\n", i, j,tmax,rhomax, A[i][j]);
 	    if((A[i][j]) > threshold){
                 rho = ((double) j) - ((double)rhomax)/2;
                 line_trace(input, (double) i, rho);
@@ -75,7 +75,8 @@ void hough_trace(int** A, double x, double y, double rhomax){
     for(size_t t = 0; t < tmax; t++){
         theta = ((double) t/10)*(M_PI/180);
         rho = (rhomax/2) + x*cos(theta) + y*sin(theta);
-        A[t][(size_t) rho] += 1;
+	size_t r = (size_t) rho;
+	A[t][r] += 1;
     }
 }
 
@@ -83,17 +84,11 @@ SDL_Surface* hough_transform(SDL_Surface* input){
     size_t height = input->h, width = input->w;
     size_t rhomax = 2*(height+width);
     int** A = init_matrice(tmax, rhomax);
-    //for(size_t i = 0; i < tmax; i++){
-    //    for(size_t j = 0; j < rhomax; j++)
-    //	  printf("i = %zu ; j = %zu ; val = %i\n",i,j,A[i][j]);
-    //}
-
     for(size_t i = 0; i < height; i++){
         for(size_t j = 0; j < width; j++){
             if(get_pixel(input, i, j).r > 0)
                 hough_trace(A, (double) i, (double) j, (double) rhomax);
         }
-	//printf("line : %zu\n",i);
     }
 
     int threshold = (max(A, rhomax))/2;
