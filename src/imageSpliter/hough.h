@@ -7,14 +7,14 @@ int** init_matrice(size_t height, size_t width);
 
 void free_matrice(int** A, size_t height);
 
-void print_matrice(int**A, size_t height, size_t width);
+int max(int** A, size_t rhomax);
 
-SDL_Surface* better_print(int** A, size_t height, size_t width);
+SDL_Surface* hough_print(int**A, size_t rhomax);
 
-void place_point(int** A, size_t x, size_t y, int max);
+void line_trace(SDL_Surface* input, double theta, double rho, double rhomax);
 
-void mapping(SDL_Surface* image, int** A, int mid);
+void hough_trace(int** A, double x, double y, double rhomax);
 
-void hough_transform();
+SDL_Surface* hough_transform(SDL_Surface* input);
 
 #endif

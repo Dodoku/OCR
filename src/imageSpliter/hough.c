@@ -7,6 +7,7 @@
 
 #include "../tools/image.h"
 
+#define tmax 360
 
 int** init_matrice(size_t height, size_t width){
 	int **A = malloc(sizeof(int*[height]));
@@ -31,66 +32,80 @@ void free_matrice(int** A, size_t height){
 	free(A);
 }
 
-void print_matrice(int**A, size_t height, size_t width){
-	for (size_t i = 0; i < height; i++){
-		printf("| ");
-        for (size_t j = 0; j < width ; j++){
-			printf("%i | ",A[i][j]);
+int max(int** A, size_t rhomax){
+    int max = 0;
+    for(size_t i = 0; i < tmax; i++){
+        for(size_t j = 0; j < rhomax; j++){
+            if(A[i][j] > max){
+                max = A[i][j];
+            }
         }
-        printf("\n");
+    }
+    return max;
+}
+
+SDL_Surface* hough_print(int**A, size_t rhomax){
+    SDL_Surface* output = create_empty(tmax, rhomax);
+    int valmax = max(A,rhomax);
+    Uint8 value;
+    for(size_t i = 0; i < tmax; i++){
+        for(size_t j = 0; j < rhomax; j++){
+	    value = (A[i][j]*255)/valmax;
+	    set_pixel(output,i,j,to_color(value,value,value,255));
 	}
-}
-
-/*
-SDL_Surface* render_line(SDL_Surface image){
-}
-*/
-
-SDL_Surface* better_print(int** A, size_t height, size_t width){
-    SDL_Surface* print = create_empty(width, height);
-    for (size_t i = 0; i < height; i++){
-        for (size_t j = 0; j < width; j++){
-            int color = A[j][i];
-            if (color>255)
-                color = 255;
-            set_pixel(print, j, i, to_color(color, color, color, 255));
-        }
     }
-    return print;
+    return output;
 }
 
-void place_point(int** A, size_t x, size_t y, int max){
-    double rho;
-	double theta;
-    for (size_t t = 0; t < 180; t++){
-        theta = t*(M_PI/180);
-        rho = max + x*cos(theta) + y*sin(theta);
-        A[(int)rho][t] += 1;
+void line_trace(SDL_Surface* input, double theta, double rho){
+    size_t height = input->h, width = input->w;
+    double y;
+    size_t i, j;
+    for (double x = 0; x < width; x++){
+        y = rho - x*cos(theta);
+	y /= sin(theta);
+	if (x>0 && y>0){
+            i = (size_t) x, j = (size_t) y;
+	    if (i < height && j < width){
+                set_pixel(input, j, i, to_color(255,0,0,255));
+	    }
+	}
     }
 }
 
-void mapping(SDL_Surface* image, int** A, int mid){
-    for (int i = 0; i < image->w; i++) {
-        for (int j = 0; j < image->h; j++) {
-            Uint8 value = get_pixel(image, i, j).r;
-            if (value == 255)
-                place_point(A, i, j, mid);
-        }
+void hough_trace(int** A, double x, double y, double rhomax){
+    double rho, theta;
+    for(size_t t = 0; t < tmax; t++){
+        theta = ((double) t)*(M_PI/180);
+        rho = (rhomax/2) + x*cos(theta) + y*sin(theta);
+        A[t][(size_t) rho] += 1;
     }
 }
 
-void hough_transform(SDL_Surface* image){
-    //init values
-    size_t height = image->h;
-    size_t width = image->w;
+SDL_Surface* hough_transform(SDL_Surface* input){
+    size_t height = input->h, width = input->w;
     size_t rhomax = 2*(height+width);
-    int** A = init_matrice(rhomax, 180);
-    //mapping
-    mapping(image, A, rhomax/2);
-    //print
-    SDL_Surface* print = better_print(A, rhomax, 180);
-    save(print, "tests/assets/sinus.jpeg");
-    //free values
-    free_matrice(A, rhomax);
-}
+    int** A = init_matrice(tmax, rhomax);
 
+    for(size_t i = 0; i < height; i++){
+        for(size_t j = 0; j < width; j++){
+            if(get_pixel(input, i, j).r > 0)
+                hough_trace(A, (double) i, (double) j, (double) rhomax);
+        }
+	//printf("line : %zu\n",i);
+    }
+
+    return hough_print(A,rhomax);/*
+    int threshold = max(A, rhomax);
+    threshold = (3 * threshold)/4;
+    printf("threshold = %i\n", threshold);
+    for(size_t x = 1; x < tmax; x++){
+	for(size_t y = 0; y < rhomax; y++){
+	    if (A[x][y] > threshold)
+		line_trace(input, (double) x, (double) (y-rhomax/2));
+	}
+    }
+    printf("threshold = %i\n", threshold);
+    free_matrice(A,tmax);
+    return input;*/
+}
