@@ -34,33 +34,17 @@ void free_matrice(int** A, size_t height){
 
 int max(int** A, size_t rhomax){
     int max = 0;
-    size_t x = 0, y = 0;
     for(size_t i = 0; i < tmax; i++){
         for(size_t j = 0; j < rhomax; j++){
-            if(A[i][j] > max){
-                x = i;
-                y = j;
+            if(A[i][j] > max)
                 max = A[i][j];
-            }
         }
     }
     return max;
 }
 
-void hough_lines(SDL_Surface* input, size_t A, size_t rhomax, size_t threshold){
-    double rho;
-    for(size_t i = 0; i < tmax; i++){
-        for(size_t j = 0; j < rhomax; j++){
-            if(A[i][j] > threshold){
-                rho = ((double) j) - ((double)rhomax)/2;
-                line_trace(input, (double) i, rho);
-            }
-        }
-    }
-}
-
 void line_trace(SDL_Surface* input, double theta, double rho){
-    size_t height = input->h, width = input->w;)
+    size_t height = input->h, width = input->w;
     double y;
     size_t i, j;
     for (double x = 0; x < width; x++){
@@ -69,6 +53,19 @@ void line_trace(SDL_Surface* input, double theta, double rho){
             i = (size_t) x, j = (size_t) y;
             if (i < height && j < width)
                 set_pixel(input, i, j, to_color(255,0,0,255));
+        }
+    }
+}
+
+void hough_lines(SDL_Surface* input, int** A, size_t rhomax, int threshold){
+    double rho;
+    for(size_t i = 0; i < tmax; i++){
+        for(size_t j = 0; j < rhomax; j++){
+	    printf("i = %zu ; j = %zu\n ; tmax = %u ; rhomax = %zu\n; val = %i\n", i, j,tmax,rhomax, A[i][j]);
+	    if((A[i][j]) > threshold){
+                rho = ((double) j) - ((double)rhomax)/2;
+                line_trace(input, (double) i, rho);
+            }
         }
     }
 }
@@ -86,18 +83,21 @@ SDL_Surface* hough_transform(SDL_Surface* input){
     size_t height = input->h, width = input->w;
     size_t rhomax = 2*(height+width);
     int** A = init_matrice(tmax, rhomax);
-    //SDL_Surface* output = create_empty(width, height);
+    //for(size_t i = 0; i < tmax; i++){
+    //    for(size_t j = 0; j < rhomax; j++)
+    //	  printf("i = %zu ; j = %zu ; val = %i\n",i,j,A[i][j]);
+    //}
 
     for(size_t i = 0; i < height; i++){
         for(size_t j = 0; j < width; j++){
             if(get_pixel(input, i, j).r > 0)
                 hough_trace(A, (double) i, (double) j, (double) rhomax);
         }
-	printf("line : %zu\n",i);
+	//printf("line : %zu\n",i);
     }
 
-    size_t threshold = (max(A, rhomax))/2;
-    line_trace(input, (double) x,(double) y);
+    int threshold = (max(A, rhomax))/2;
+    hough_lines(input, A, rhomax, threshold);
     free_matrice(A,tmax);
     return input;
 }

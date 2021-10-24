@@ -13,7 +13,7 @@ BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
 CC = gcc
-CFLAGS = -Wall -Wextra $(shell sdl2-config --cflags)
+CFLAGS = -Wall -Wextra -g $(shell sdl2-config --cflags)
 LDFLAGS = -export-dynamic $(shell sdl2-config --libs) -lm -lSDL2_image
 
 ALLFILES = $(shell find . -name "*.[ch]")
