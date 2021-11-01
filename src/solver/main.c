@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     solve(grid);
 
     char *out = argv[1];
-    strcat(out, ".out");
+    strcat(out, ".result");
     save_grid(out, grid);
 
     printf("Sudoku solved and saved as \"%s\"\n", out);
