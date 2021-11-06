@@ -6,7 +6,7 @@ typedef struct {
     int nbWeights;
 
     double *weights;
-    double biais;
+    //double biais; Not useful in our situation
     double delta;
 
     double value;
