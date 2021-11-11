@@ -6,7 +6,7 @@
 
 #include "neuralNetwork.h"
 #include "dataLoader.h"
-
+#include "../tools/image.h"
 
 Data init_data(int nbLines, int nbColumns){
     Data data;
@@ -146,4 +146,46 @@ void save_network(Network *net, char *path){
 
     save_data(&data, path);
     free_data(&data);
+}
+
+FILE *open_train(char *path){
+    FILE *fp;
+
+    fp = fopen(path, "r");
+    if (!fp)
+        errx(1, "Couldn't open %s\n", path);
+
+    return fp;
+}
+
+
+TrainData read_train_image(FILE *file){
+    TrainData data;
+
+    data.expectedNumber = -1;
+
+    char c;
+    int readImage = 0;
+
+    SDL_Surface *image = create_empty(28, 28);
+    size_t x = 0;
+
+    while((c = fgetc(file)) != EOF){
+        if(c == '\n')
+            break;
+        if(c >= '0' && c <= '9' && x < 28*28){
+            if(readImage){
+                set_pixel(image, x%28, x/28, (c - '0') == 0 ? to_color(0, 0, 0, 255)
+                                                : to_color(255, 255, 255, 255));
+                x++;
+            }else{
+                data.expectedNumber = c - '0';
+                readImage = 1;  
+            }
+        }
+    }
+
+    data.image = image;
+
+    return data;
 }
