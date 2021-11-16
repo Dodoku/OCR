@@ -6,22 +6,28 @@
 #include "hough.h"
 #include "../tools/image.h"
 
-int main(int argc, char *argv[]) {
-    if(argc != 3){
-	printf("failed to split, use the architecture below :\n");
-	printf("./build/imageSpliter load_path save_path\n");
-	return 1;
+int main(int argc, char *argv[])
+{
+    char s[] = "tests/assets/image_00.jpeg";
+    char s1[] = "0.jpeg";
+    for(int i = 1; i < 7; i++)
+    {
+        s[20] = '0'+i;
+        s1[0] = '0'+i;
+        SDL_Surface* image = load(s);
+        image = to_grayscale(image);
+        image = otsu(image);
+
+        save(image, s1);
+        printf("generate image -> %s\n",s1);
     }
-    SDL_Surface* input = load(argv[1]);
-    SDL_Surface* output = hough_transform(input);
-    save(output, argv[2]);
     return 0;
 }
 
 /*
 int main() {
     SDL_Surface* image = load("tests/assets/imageGrey_01.jpeg");
-    hough_transform(image);    
+    hough_transform(image);
     return 0;
 }
 
