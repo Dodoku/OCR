@@ -23,12 +23,20 @@ int main(int argc, char *argv[]){
 
     train_number(&net, "train.data");
 
+    //net = load_network("record_numbers.data");
 
-    SDL_Surface *image = load("tests/network/number_1.jpg");
-    int result = eval_number(&net, image);
-    printf("%i\n", result);
+    for(int i = 0; i < 10; i++){
+        char str[40] = "tests/network/numbers_v2/";
+        char num = i + '0';
+        strncat(str, &num, 1);
+        strcat(str, ".jpg");
+        SDL_Surface *image = load(str);
+        int result = eval_number(&net, image);
+        printf("%s => %i\n", str, result);
+        SDL_FreeSurface(image);
+    }
 
-    //save_network(&net, "record_numbers.data");
+    save_network(&net, "record_numbers.data");
 
     /*for(int i = 0; i <= 9; i++){
             char path[1024] = "";

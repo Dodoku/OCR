@@ -193,7 +193,10 @@ TrainData read_train_image(FILE *file){
         }
     }
 
-    data.image = image;
+    if(data.expectedNumber == -1)
+        SDL_FreeSurface(image);
+    else
+        data.image = image;
 
     return data;
 }
