@@ -16,9 +16,14 @@ Data init_data(int nbLines, int nbColumns){
 
     data.data = malloc(data.nbLines * sizeof(*data.data));
 
-    for(int i = 0; i < data.nbLines; i++)
+    for(int i = 0; i < data.nbLines; i++){
         data.data[i] = malloc(data.nbColumns * sizeof(**data.data));
+    }
 
+    for(int i = 0; i < data.nbLines; i++)
+        for(int j = 0; j < data.nbColumns; j++)
+            data.data[i][j] = 0;
+        
     return data;
 }
 
@@ -90,6 +95,8 @@ void save_data(Data *data, char *path){
         }
         fprintf(fp, "\n");
     }
+
+    fclose(fp);
 }
 
 void free_data(Data *data){
@@ -127,7 +134,8 @@ void save_network(Network *net, char *path){
     if(max < net->output.nbNeurons)
         max = net->output.nbNeurons;
 
-    Data data = init_data(2 + net->nbHiddens * net->hiddens[0].nbNeurons, max);
+    Data data = init_data(1 + net->output.nbNeurons + net->hiddens[0].nbNeurons
+                                     * net->nbHiddens, max);
     data.data[0][0] = net->input.nbNeurons;
     data.data[0][1] = net->nbHiddens;
     data.data[0][2] = net->hiddens[0].nbNeurons;
