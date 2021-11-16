@@ -19,11 +19,11 @@ int main(int argc, char *argv[]){
 
     Network net;
 
-    net = init_number();
+    net = load_network("record_numbers.data");
 
-    train_number(&net, "train.data");
+    //train_number(&net, "train.data");
 
-    //net = load_network("record_numbers.data");
+    //net = 
 
     for(int i = 0; i < 10; i++){
         char str[40] = "tests/network/numbers_v2/";
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
         SDL_FreeSurface(image);
     }
 
-    save_network(&net, "record_numbers.data");
+    //save_network(&net, "record_numbers.data");
 
     /*for(int i = 0; i <= 9; i++){
             char path[1024] = "";

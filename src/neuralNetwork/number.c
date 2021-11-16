@@ -14,7 +14,7 @@
 #define imageSize 28
 
 #define validCount 100
-#define timeOutCount 500
+#define timeOutCount 250
 
 Network init_number(){
     return init_network(imageSize*imageSize, nbHiddens, nbNeurons, 10);
@@ -95,8 +95,8 @@ int eval_number(Network *net, SDL_Surface *image){
     for(int k = 0; k < 10; k++){
         if(net->output.neurons[k].value > net->output.neurons[max].value)
             max = k;
-        printf("%i: %f\n", k, net->output.neurons[k].value);
+        //printf("%i: %f\n", k, net->output.neurons[k].value);
     }
-    printf("\n");
+    //printf("\n");
     return max;
 }
