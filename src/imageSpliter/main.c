@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     SDL_Surface* image = load(s);
     SDL_Surface* ret;
     ret = split(image,333,333,666,666);
+    ret = resize(ret,50,50);
 
     save(ret, "splited.jpeg");
     printf("image saved");

@@ -15,4 +15,6 @@ SDL_Color to_color(int r, int g, int b, int a);
 SDL_Color int_to_color(Uint32 num);
 Uint32 color_to_int(SDL_Color color);
 
+SDL_Surface* resize(SDL_Surface* image, int w, int h);
+
 #endif
