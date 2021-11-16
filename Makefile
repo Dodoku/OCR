@@ -13,8 +13,8 @@ BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
 CC = gcc
-CFLAGS = -Wall -Wextra -g $(shell sdl2-config --cflags)
-LDFLAGS = -export-dynamic $(shell sdl2-config --libs) -lm -lSDL2_image
+CFLAGS = -Wall -Wextra -g -fsanitize=address $(shell sdl2-config --cflags)
+LDFLAGS = -export-dynamic -fsanitize=address $(shell sdl2-config --libs) -lm -lSDL2_image
 
 ALLFILES = $(shell find . -name "*.[ch]")
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
