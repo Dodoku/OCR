@@ -7,7 +7,7 @@
 
 #include "../tools/image.h"
 
-#define tmax 179
+#define tmax 180
 
 size_t calc_rhomax(SDL_Surface* image){
     return (size_t) sqrt(image->w * image->w + image->h * image->h);
@@ -72,15 +72,27 @@ int max(int** A, size_t rhomax){
 
 void line_trace(SDL_Surface* input, double theta, double rho){
     size_t height = input->h, width = input->w;
-    double y;
+    double x, y;
     size_t i, j;
-    for (double x = 0; x < width; x++){
+    for (x = 0; x < width; x++){
         y = rho - x*cos(theta);
         y /= sin(theta);
         if (x>0 && y>0){
-                i = (size_t) x, j = (size_t) y;
+                i = (size_t) x;
+                j = (size_t) y;
                 if (i < width && j < height){
                         set_pixel(input, i, j, to_color(255,0,0,255));
+                }
+        }
+    }
+    for (y = 0; y < height; y++){
+        x = rho - y*sin(theta);
+        x /= cos(theta);
+        if (x>0 && y>0){
+                i = (size_t) x;
+                j = (size_t) y;
+                if (i < width && j < height){
+                        set_pixel(input, i, j, to_color(0,255,0,255));
                 }
         }
     }
@@ -91,7 +103,7 @@ void hough_trace(int** A, double x, double y, size_t rhomax){
     for(size_t t = 0; t < tmax; t++){
         theta = ((double) t)*(M_PI/180);
         rho = x*cos(theta) + y*sin(theta);
-        set_value(A, rhomax, theta, rho, get_value(A, rhomax, theta, rho) + 1);
+        set_value(A, rhomax, t, rho, get_value(A, rhomax, t, rho) + 1);
     }
 }
 
@@ -102,20 +114,23 @@ void hough_transform(SDL_Surface* input){
 
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
-            if(get_pixel(input, i, j).r < 255/2)
+            if(get_pixel(input, i, j).r > 255/2)
                 hough_trace(A, (double) i, (double) j, rhomax);
         }
     }
 
-    int threshold = max(A, rhomax);
-    threshold /= 2;
+    int threshold = 7*max(A, rhomax);
+    threshold /= 10;
 
     printf("threshold = %i\n", threshold);
 
     for(unsigned int t = 0; t < tmax; t++){
         for(int r = -rhomax; r < (int) rhomax; r++){
-            if (get_value(A, rhomax, t, r) > threshold)
-                line_trace(input, (double) t, (double) r);
+            if (get_value(A, rhomax, t, r) > threshold){
+                double theta = ((double) t)*(M_PI/180);
+                line_trace(input, theta, (double) r);
+            }
+                
         }
     }
     printf("threshold = %i\n", threshold);
