@@ -24,7 +24,7 @@ void set_value(int **A, size_t rhomax, unsigned int theta, int rho,
 
 int** init_matrice(size_t rhomax){
 	int **A = malloc(sizeof(int*[tmax]));
-    
+
     for (size_t i = 0; i < tmax; i++){
         A[i] = malloc(sizeof(int[rhomax*2]));
     }
@@ -34,7 +34,7 @@ int** init_matrice(size_t rhomax){
 			A[i][j] = 0;
 		}
 	}
-	
+
 	return A;
 }
 
@@ -107,10 +107,13 @@ void hough_trace(int** A, double x, double y, size_t rhomax){
     }
 }
 
-void hough_transform(SDL_Surface* input){
+double hough_transform(SDL_Surface* input){
     size_t height = input->h, width = input->w;
     size_t rhomax = calc_rhomax(input);
     int** A = init_matrice(rhomax);
+
+    long count=0;
+    long double ret=0;
 
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
@@ -119,20 +122,25 @@ void hough_transform(SDL_Surface* input){
         }
     }
 
-    int threshold = 7*max(A, rhomax);
+    int threshold = 6*max(A, rhomax);
     threshold /= 10;
 
-    printf("threshold = %i\n", threshold);
+    //printf("threshold = %i\n", threshold);
 
     for(unsigned int t = 0; t < tmax; t++){
         for(int r = -rhomax; r < (int) rhomax; r++){
             if (get_value(A, rhomax, t, r) > threshold){
                 double theta = ((double) t)*(M_PI/180);
                 line_trace(input, theta, (double) r);
+                //printf("%u\n", t);
+                count++;
+                ret+=t;
             }
-                
+
         }
     }
-    printf("threshold = %i\n", threshold);
+    //printf("threshold = %i\n", threshold);
     free_matrice(A);
+
+    return ret/count;
 }
