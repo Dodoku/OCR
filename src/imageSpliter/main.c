@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
 	return 1;
     }
     SDL_Surface* input = load(argv[1]);
-    SDL_Surface* output = hough_transform(input);
-    save(output, argv[2]);
+    hough_transform(input);
+    save(input, argv[2]);
     return 0;
 }
 

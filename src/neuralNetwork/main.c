@@ -3,11 +3,13 @@
 #include <time.h>
 
 #include "neuralNetwork.h"
+#include "../tools/image.h"
 #include "dataLoader.h"
 
 #include "xor.h"
+#include "number.h"
 
-
+#define assets_folder "tests/network/numbers"
 /**
  * ./neuronNetwork (path)
  */
@@ -17,7 +19,23 @@ int main(int argc, char *argv[]){
 
     Network net;
 
-    if(argc >= 2){
+    net = init_number();
+
+    train_number(&net);
+
+    for(int i = 0; i <= 9; i++){
+            char path[1024] = "";
+            strcat(path, assets_folder);
+            strcat(path, "/");
+            strcat(path, (char[2]) { (char) i + '0', '\0' });
+            strcat(path, ".jpg");
+
+            SDL_Surface *image = load(path);
+            int result = eval_number(&net, image);
+            printf("Input image %i.jpg : result is %i\n", i, result);
+    }
+
+    /*if(argc >= 2){
         printf("Loading Network WITH Data file...\n");
         net = load_network(argv[1]);
         printf("Loading Data finished\n");
@@ -70,7 +88,7 @@ int main(int argc, char *argv[]){
             save_network(&net, path);
             printf("File saved successfully in %s\n", path);
         }
-    }
+    }*/
 
     free_network(&net);
     return EXIT_SUCCESS;
