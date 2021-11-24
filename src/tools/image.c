@@ -5,7 +5,12 @@
 
 #include "image.h"
 
-// return an empty SDL_Surface
+/*
+ * return a empty surface
+ * @param w,h (int) : the heigh and the width of the surface
+ * @return (SDL_Surface*) : the empty surface
+ * @author Nicolas Prevost
+ */
 SDL_Surface *create_empty(int w, int h) {
     SDL_Surface *ret = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
     for (int i = 0; i < w; i++) {
@@ -16,7 +21,12 @@ SDL_Surface *create_empty(int w, int h) {
     return ret;
 }
 
-// return the surface from a path to load a picture
+/*
+ * try to load a picture from the path
+ * @param path (char*) : the path of the picture
+ * @return (SDL_Surface*) : the loaded surface
+ * @author Valentin Uhlrich
+ */
 SDL_Surface *load(char *path) {
     SDL_Surface *image = IMG_Load(path);
     if (!image) {
@@ -25,6 +35,12 @@ SDL_Surface *load(char *path) {
     return image;
 }
 
+/*
+ * save the picture at the given path
+ * @param (SDL_Surface*) : the picture to save
+ * @param path (char*) : the path were to save
+ * @author Valentin Uhlrich
+ */
 void save(SDL_Surface *image, char *path) {
     if (IMG_SaveJPG(image, path, 100) < 0) {
         errx(1, "%s\n", IMG_GetError());
@@ -64,4 +80,27 @@ SDL_Color int_to_color(Uint32 value) {
 Uint32 color_to_int(SDL_Color color) {
     return (Uint32) ((color.r) + (color.g << 8) + (color.b << 16)
                      + (color.a << 24));
+}
+
+/*
+ * rescale the picture
+ * @param image (SDL_Surface*) : the picture to rescale
+ * @param w,h (int) : the new sclale of the picure
+ * @return (SDL_Surface*) : return the scale picure
+ * @author Nicolas Prevost
+ */
+SDL_Surface* resize(SDL_Surface* image, int w, int h)
+{
+    SDL_Surface* ret = create_empty(w, h);
+    for(int i=0;i<image->w;i++)
+    {
+        for(int j=0;j<image->h;j++)
+        {
+            set_pixel(ret,
+                (double)i/(double)(image->w)*(double)w,
+                (double)j/(double)(image->h)*(double)h,
+                get_pixel(image,i,j));
+        }
+    }
+    return ret;
 }
