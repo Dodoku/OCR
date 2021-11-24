@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     ret = split(image,333,333,666,666);
     ret = resize(ret,50,50);
 
+
     save(ret, "splited.jpeg");
     printf("image saved");
 
