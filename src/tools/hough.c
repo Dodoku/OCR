@@ -57,19 +57,6 @@ int max(int** A, size_t rhomax){
     return max;
 }
 
-/*SDL_Surface* hough_print(int**A, size_t rhomax){
-    SDL_Surface* output = create_empty(tmax, rhomax);
-    int valmax = max(A,rhomax);
-    Uint8 value;
-    for(size_t i = 0; i < tmax; i++){
-        for(size_t j = 0; j < rhomax; j++){
-	    value = (A[i][j]*255)/valmax;
-	    set_pixel(output,i,j,to_color(value,value,value,255));
-	}
-    }
-    return output;
-}*/
-
 void line_trace(SDL_Surface* input, double theta, double rho){
     size_t height = input->h, width = input->w;
     double x, y;
@@ -112,9 +99,6 @@ double hough_transform(SDL_Surface* input){
     size_t rhomax = calc_rhomax(input);
     int** A = init_matrice(rhomax);
 
-    long count=0;
-    long double ret=0;
-
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
             if(get_pixel(input, i, j).r > 255/2)
@@ -125,22 +109,15 @@ double hough_transform(SDL_Surface* input){
     int threshold = 6*max(A, rhomax);
     threshold /= 10;
 
-    //printf("threshold = %i\n", threshold);
-
     for(unsigned int t = 0; t < tmax; t++){
         for(int r = -rhomax; r < (int) rhomax; r++){
             if (get_value(A, rhomax, t, r) > threshold){
                 double theta = ((double) t)*(M_PI/180);
-                line_trace(input, theta, (double) r);
-                //printf("%u\n", t);
-                count++;
-                ret+=t;
+                return theta
             }
-
         }
     }
-    //printf("threshold = %i\n", threshold);
     free_matrice(A);
 
-    return ret/count;
+    return 0
 }
