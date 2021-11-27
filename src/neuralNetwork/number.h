@@ -4,7 +4,7 @@
 #include <SDL2/SDL_image.h>
 
 Network init_number();
-void train_number(Network *net);
+void train_number(Network *net, char* dataset_path);
 
 int eval_number(Network *net, SDL_Surface *image);
 

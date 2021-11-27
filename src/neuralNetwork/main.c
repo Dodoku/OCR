@@ -19,11 +19,26 @@ int main(int argc, char *argv[]){
 
     Network net;
 
-    net = init_number();
+    net = load_network("record_numbers.data");
 
-    train_number(&net);
+    //train_number(&net, "train.data");
 
-    for(int i = 0; i <= 9; i++){
+    //net = 
+
+    for(int i = 0; i < 10; i++){
+        char str[40] = "tests/network/numbers_v2/";
+        char num = i + '0';
+        strncat(str, &num, 1);
+        strcat(str, ".jpg");
+        SDL_Surface *image = load(str);
+        int result = eval_number(&net, image);
+        printf("%s => %i\n", str, result);
+        SDL_FreeSurface(image);
+    }
+
+    //save_network(&net, "record_numbers.data");
+
+    /*for(int i = 0; i <= 9; i++){
             char path[1024] = "";
             strcat(path, assets_folder);
             strcat(path, "/");
@@ -33,7 +48,7 @@ int main(int argc, char *argv[]){
             SDL_Surface *image = load(path);
             int result = eval_number(&net, image);
             printf("Input image %i.jpg : result is %i\n", i, result);
-    }
+    }*/
 
     /*if(argc >= 2){
         printf("Loading Network WITH Data file...\n");

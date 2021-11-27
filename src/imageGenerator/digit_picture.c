@@ -55,7 +55,7 @@ void display_digit(SDL_Surface *image, int x, int y, int n) {
     }
 }
 
-void init_grid(char *path, int *grid) {
+void init_grid_digit(char *path, int *grid) {
     FILE *fp;
     char c;
 
@@ -91,7 +91,7 @@ void init_grid(char *path, int *grid) {
 void generate_digit_picture(char* sudoku, char* path) {
 
     int grid[81] = {0};
-    init_grid(sudoku, grid);
+    init_grid_digit(sudoku, grid);
     SDL_Surface *image = create_empty(993, 993);
     horizontal_wall(image, 0, 12);
     vertical_wall(image, 0, 12, 12);

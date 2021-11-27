@@ -17,7 +17,6 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g -fsanitize=address $(shell sdl2-config --cflags)
 LDFLAGS = -export-dynamic -fsanitize=address $(shell sdl2-config --libs) -lm -lSDL2_image
 
-
 ALLFILES = $(shell find . -name "*.[ch]")
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
 OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
@@ -44,12 +43,11 @@ format:
 #
 # Builds
 #
-ocr: module/imageProcess module/imageSpliter module/neuralNetwork module/solver module/imageGenerator
 
-#ocr: $(OBJ)
-#	@echo "Linking OCR..."
-#	@$(CC) -o $@ $^ $(LDFLAGS)
-#	@echo "Build Finished"
+ocr: $(OBJ)
+	@echo "Linking OCR..."
+	@$(CC) -o $@ $^ $(LDFLAGS)
+	@echo "Build Finished"
 
 #
 #Modules
