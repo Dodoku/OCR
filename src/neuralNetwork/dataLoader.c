@@ -200,3 +200,16 @@ TrainData read_train_image(FILE *file){
 
     return data;
 }
+
+int countLines(FILE *fp){
+
+    int lines = 0;
+    
+    while(!feof(fp)){
+        if(getc(fp) == '\n')
+            lines++;
+    }
+
+    fclose(fp);
+    return lines;
+}

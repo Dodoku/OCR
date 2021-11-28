@@ -26,5 +26,6 @@ void save_network(Network *net, char *path);
 FILE *open_train(char *path);
 TrainData read_train_image(FILE *file);
 
+int countLines(FILE *fp);
 
 #endif
