@@ -63,8 +63,8 @@ void line_trace(SDL_Surface* input, double theta, double rho){
     size_t i, j;
     for (x = 0; x < width; x++){
         y = rho - x*cos(theta);
-        y /= sin(theta);
-        if (x>0 && y>0){
+        y /= sin(theta); //y*sin(theta) = rho - x*cos(theta)
+        if (x>0 && y>0){ 
                 i = (size_t) x;
                 j = (size_t) y;
                 if (i < width && j < height){
@@ -74,7 +74,7 @@ void line_trace(SDL_Surface* input, double theta, double rho){
     }
     for (y = 0; y < height; y++){
         x = rho - y*sin(theta);
-        x /= cos(theta);
+        x /= cos(theta); //x*cos(theta) = rho - y*sin(theta)
         if (x>0 && y>0){
                 i = (size_t) x;
                 j = (size_t) y;
@@ -94,11 +94,13 @@ void hough_trace(int** A, double x, double y, size_t rhomax){
     }
 }
 
+
 double hough_transform(SDL_Surface* input){
     size_t height = input->h, width = input->w;
     size_t rhomax = calc_rhomax(input);
     int** A = init_matrice(rhomax);
 
+    // 1st step - Get hough 
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
             if(get_pixel(input, i, j).r > 255/2)
@@ -106,18 +108,41 @@ double hough_transform(SDL_Surface* input){
         }
     }
 
-    int threshold = 6*max(A, rhomax);
-    threshold /= 10;
+    // 2nd step - Find hough threshold
+    int threshold = max(A, rhomax);
+
+    // 3rd step - Find all the interesting function
+    size_t* thetalist = calloc(0, sizeof(size_t));
+    size_t* rholist = calloc(0, sizeof(size_t));
+    size_t length = 0;
 
     for(unsigned int t = 0; t < tmax; t++){
         for(int r = -rhomax; r < (int) rhomax; r++){
             if (get_value(A, rhomax, t, r) > threshold){
-                double theta = ((double) t)*(M_PI/180);
-                return theta
+                length++;
+                thetalist = realloc(thetalist, length * sizeof(size_t));
+                thetalist[length-1] = t;
+                rholist = realloc(rholist, length * sizeof(size_t));
+                rholist[length-1] = r;
             }
         }
     }
+
+    // 4th step - Find all intersection function
+
+    // 5th step - Get the index of the highest and lowest interaction function
+
+    // 6th step - Erase all detected line by covering them in black
+
+    // 7th step - Cut the picture to only have the grid
+
+    // nth step - Free dynamic memory allocation
+    double thetamin = 0;
+    if (length != 0)
+        thetamin = thetalist[0];
+    free(thetalist);
+    free(rholist);
     free_matrice(A);
 
-    return 0
+    return thetamin;
 }
