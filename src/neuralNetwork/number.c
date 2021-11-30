@@ -30,7 +30,6 @@ void train_number_with_gui(Network *net, char* dataset_path, int loop,
     for (int i = 0; i < loop; i++)
     {
         FILE *fp = open_train(dataset_path);
-
         TrainData data;
         while((data = read_train_image(fp)).expectedNumber >= 0){
             for(int y = 0; y < imageSize; y++){
@@ -60,14 +59,14 @@ void train_number_with_gui(Network *net, char* dataset_path, int loop,
                 }
             }
 
-            if(max == data.expectedNumber){
-                error += 100;
+            if(max != data.expectedNumber){
+                error += 1;
             }
             countError++;
 
             if(countError < 200 || countError % 500 == 0){
-                char error_rate_str[10];
-                sprintf(error_rate_str, "%i %%", (int)(error/countError));
+                char error_rate_str[100];
+                sprintf(error_rate_str, "%i %%", (int)((error/countError)*100));
                 gtk_label_set_text(error_rate, error_rate_str);
             }
 
