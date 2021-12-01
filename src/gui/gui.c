@@ -11,6 +11,13 @@ void error_message(char *message)
     gtk_widget_destroy(dialog);
 }
 
+void info_message(char *message){
+    GtkWidget *dialog;
+    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, message);
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
 GtkBuilder *init_gui(){
     // Initializes GTK.
     gtk_init(NULL, NULL);

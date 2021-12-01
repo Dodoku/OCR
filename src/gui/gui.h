@@ -2,6 +2,8 @@
 #define GUI_H
 
 void error_message(char *message);
+void info_message(char *message);
+
 GtkBuilder *init_gui();
 
 

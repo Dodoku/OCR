@@ -5,5 +5,5 @@
 #include "imageGenerator/digit_picture.h"
 
 int main() {
-    GtkBuilder *builder = init_gui();
+    init_gui();
 }

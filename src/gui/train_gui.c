@@ -43,53 +43,41 @@ void open_train_button(GtkFileChooserButton *button, gpointer user_data){
 
 struct start_network_args {
     char *path;
+    char *pathToSave;
     int loop;
+    GtkBuilder *builder;
     GtkLabel* error_rate;
     GtkLabel* trainings_loop;
 };
 
-static void *start_network(void * p_data){
+static void *lunch_training(void * p_data){
 
-    struct start_network_args *args = p_data;
-    Network network = init_number();
-    train_number_with_gui(&network, args->path, args->loop, 
-                                    args->error_rate, args->trainings_loop);
-    free(args);
-}
+        struct start_network_args *args = p_data;
 
-gboolean lunch_training(gpointer user_data){
-
-        GtkBuilder *builder = user_data;
-
-        GtkFileChooserButton* openTrain = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, 
-                                                        "open_train_button"));
-
-        GtkSpinButton* spin = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, 
-                                                           "trainings_spin"));
-
-        GtkLabel* error_rate = GTK_LABEL(gtk_builder_get_object(builder, 
-                                                            "error_rate_value_label"));
-        GtkLabel* trainings_loop = GTK_LABEL(gtk_builder_get_object(builder, 
-                                                            "trainings_loop_value_label"));
-
-        char *loadPath = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(openTrain));
-
-        int loop = (int) gtk_spin_button_get_value(spin);
         char trains_loop_str[50];
-        sprintf(trains_loop_str, "%i / %i", 0, loop);
-        gtk_label_set_text(trainings_loop, trains_loop_str);
+        sprintf(trains_loop_str, "%i / %i", 0, args->loop);
+        gtk_label_set_text(args->trainings_loop, trains_loop_str);
 
-        struct start_network_args *args = malloc(sizeof(struct start_network_args));
-        args->path = loadPath;
-        args->loop = loop;
-        args->error_rate = error_rate;
-        args->trainings_loop = trainings_loop;
+        Network network = init_number();
+        train_number_with_gui(&network, args->path, args->loop, 
+                                    args->error_rate, args->trainings_loop);
         
-        pthread_t thread;
-        pthread_create(&thread, NULL, start_network, args);
+        save_network(&network, args->pathToSave);
+        free_network(&network);
 
-        printf("FInished\n");
-        return FALSE;
+        info_message("Training completed");
+
+        GtkButton* start_train = GTK_BUTTON(gtk_builder_get_object(args->builder, 
+                                                           "start_train_button"));
+        GtkFileChooserButton* openTrain = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(args->builder, 
+                                                        "open_train_button"));
+        GtkSpinButton* spin = GTK_SPIN_BUTTON(gtk_builder_get_object(args->builder, 
+                                                           "trainings_spin"));
+        gtk_widget_set_sensitive(GTK_WIDGET(openTrain), TRUE);
+        gtk_widget_set_sensitive(GTK_WIDGET(spin), TRUE);
+        gtk_widget_set_sensitive(GTK_WIDGET(start_train), TRUE);
+        free(args);
+        return NULL;
 }
 
 void start_train_button(GtkButton *start_train, gpointer user_data){
@@ -111,15 +99,19 @@ void start_train_button(GtkButton *start_train, gpointer user_data){
     dialog = gtk_file_chooser_dialog_new ("Save Output File",
                                         trainWindow,
                                         action,
-                                        GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
-                                        GTK_STOCK_SAVE,GTK_RESPONSE_ACCEPT,
+                                        g_dgettext("gtk30", "Cancel"),GTK_RESPONSE_CANCEL,
+                                        g_dgettext("gtk30", "Save"),GTK_RESPONSE_ACCEPT,
                                         NULL);
+    
     chooser = GTK_FILE_CHOOSER (dialog);
-    filename = gtk_file_chooser_get_filename (chooser);
-
     gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
+    gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), "record.data");
+
+    char *loadPath = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(openTrain));
 
     res = gtk_dialog_run (GTK_DIALOG (dialog));
+    
+    filename = gtk_file_chooser_get_filename (chooser);
     gtk_window_close(GTK_WINDOW(dialog));
     gtk_widget_destroy(dialog);
     if (res == GTK_RESPONSE_ACCEPT)
@@ -127,19 +119,30 @@ void start_train_button(GtkButton *start_train, gpointer user_data){
         gtk_widget_set_sensitive(GTK_WIDGET(openTrain), FALSE);
         gtk_widget_set_sensitive(GTK_WIDGET(spin), FALSE);
         gtk_widget_set_sensitive(GTK_WIDGET(start_train), FALSE);
-        g_timeout_add_full(G_PRIORITY_DEFAULT, 100, lunch_training, builder, NULL);
+        struct start_network_args *args = malloc(sizeof(struct start_network_args));
+        args->path = loadPath;
+        args->pathToSave = filename;
+        args->loop = (int) gtk_spin_button_get_value(spin);
+        args->builder = builder;
+        args->error_rate = GTK_LABEL(gtk_builder_get_object(builder, 
+                                                            "error_rate_value_label"));
+        args->trainings_loop = GTK_LABEL(gtk_builder_get_object(builder,
+                                                            "trainings_loop_value_label"));
+        pthread_t thread;
+        pthread_create(&thread, NULL, lunch_training, args);
     }
 }
 
 void open_train_gui(GtkButton *button, gpointer user_data){
     GtkBuilder *builder =  user_data;
-
     GError* error = NULL;
+    gtk_button_get_event_window (button);
+
     if (gtk_builder_add_from_file(builder, "res/dodoku_train.glade", &error) == 0)
     {
         g_printerr("Error loading file: %s\n", error->message);
         g_clear_error(&error);
-        return NULL;
+        return;
     }
 
     GtkWindow* trainWindow = GTK_WINDOW(gtk_builder_get_object(builder, 
