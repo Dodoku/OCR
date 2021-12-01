@@ -21,3 +21,22 @@ SDL_Surface* split(SDL_Surface* image, int x1, int y1, int x2, int y2)
     }
     return ret;
 }
+
+void insert_picture(SDL_Surface* image, int x1, int y1, int x2, int y2, int n)
+{
+    char path[]="src/assets/0.jpg";
+    path[11]=n+'0';
+    SDL_Surface* number = load(path);
+    number = resize(number,x2-x1,y2-y1);
+    save(number,"number.jpg");
+    for(int i=0;i<number->w;i++)
+    {
+        for(int j=0;j<number->h;j++)
+        {
+            if(get_pixel(number,i,j).r==0)
+            {
+                set_pixel(image,x1+i,y1+j,to_color(0,0,0,0));
+            }
+        }
+    }
+}
