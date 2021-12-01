@@ -11,88 +11,43 @@
 #include "grayscale.h"
 #include "noise_reduction.h"
 
-int main(int argc, char *argv[]) {
-    if(argc == 1){
-        printf("\n\nUse all + '-' + '-'\n(to apply all the filters on all the pictures)\n\n");
-        printf("Use all + path-src + path-dest\n(to apply all the filters)\n\n");
-        printf("Use greyscale + path-src + path-dest\n(to put a picture in grayscale)\n\n");
-        printf("Use rotate + path-src + path-dest + degree\n(to rotate a picture with a degree in degree)\n\n");
-        printf("Use blur + path-rc + path-dest + n\n(to apply the gaussian_blur n times)\n\n");
-        printf("Use otsu + path-rc + path-dest \n(to binarise the picture)\n\n");
-        return 1;
-    }
+int main(int argc, char *argv[])
+ {
+    SDL_Surface* image1 = load("tests/assets/image_01.jpeg");
+    SDL_Surface* image2 = load("tests/assets/image_02.jpeg");
+    SDL_Surface* image3 = load("tests/assets/image_03.jpeg");
+    SDL_Surface* image4 = load("tests/assets/image_04.jpeg");
+    SDL_Surface* image5 = load("tests/assets/image_05.jpeg");
+    SDL_Surface* image6 = load("tests/assets/image_06.jpeg");
 
-    if(!strcmp(argv[1],"grayscale")){
-        if(argc != 4)
-            errx(1,"grayscale -> wrong number of argument\n");
-        SDL_Surface* image = load(argv[2]);
-        image = to_grayscale(image);
-        save(image, argv[3]);
-        printf("grayscale -> picture saved\n");
-        return 0;
-    }
+    image1 = gaussian_blur(image1, 5);
+    image1 = otsu(image1,20);
+    save(image1, "generated1.jpeg");
+    printf("blur -> picture saved\n");
 
-    if(!strcmp(argv[1],"rotate")){
-        if(argc != 5)
-            errx(1,"rotate -> wrong number of argument\n");
-        SDL_Surface* image = load(argv[2]);
-        image = rotate(image, -atoi(argv[4])*3.14/180);
-        save(image, argv[3]);
-        printf("rotate -> picture saved\n");
-        return 0;
-    }
+    image2 = gaussian_blur(image2, 5);
+    image2 = otsu(image2,20);
+    save(image2, "generated2.jpeg");
+    printf("blur -> picture saved\n");
 
-    if(!strcmp(argv[1],"blur")){
-        if(argc != 5)
-            errx(1,"blur -> wrong number of argument\n");
-        SDL_Surface* image = load(argv[2]);
-        image = gaussian_blur(image, atoi(argv[4]));
-        save(image, argv[3]);
-        printf("blur -> picture saved\n");
-        return 0;
-    }
+    image3 = gaussian_blur(image3, 5);
+    image3 = otsu(image3,20);
+    save(image3, "generated3.jpeg");
+    printf("blur -> picture saved\n");
 
-    if(!strcmp(argv[1],"otsu")){
-        if(argc != 4)
-            errx(1,"otsu -> wrong number of argument\n");
-        SDL_Surface* image = load(argv[2]);
-        image = otsu(image);
-        save(image, argv[3]);
-        printf("otsu -> picture saved\n");
-        return 0;
-    }
+    image4 = gaussian_blur(image4, 5);
+    image4 = otsu(image4,20);
+    save(image4, "generated4.jpeg");
+    printf("blur -> picture saved\n");
 
-    if(!strcmp(argv[1],"all")){
-        if(argc != 4)
-            errx(1,"all -> wrong number of argument\n");
-        if(!strcmp(argv[2],"-")){
-            char s[] = "tests/assets/image_00.jpeg";
-            char s1[] = "0.jpeg";
-            for(int i = 1; i < 7; i++){
-                s[20] = '0'+i;
-                s1[0] = '0'+i;
-                SDL_Surface* image = load(s);
-                image = to_grayscale(image);
-                image = otsu(image);
+    image5 = gaussian_blur(image5, 5);
+    image5 = otsu(image5,20);
+    save(image5, "generated5.jpeg");
+    printf("blur -> picture saved\n");
 
-                save(image, s1);
-                printf("generate image -> %s\n",s1);
-            }
-        }
-        else{
-            SDL_Surface* image = load(argv[2]);
-            image = to_grayscale(image);
-            //image = gaussian_blur(image, 1);
-            //image = simple_blur(image,2);
-            image = otsu(image);
-            save(image, argv[3]);
-            printf("all -> picture saved\n");
-            return 0;
-        }
-        return 0;
-    }
-
-
-    printf("wrong argument\n");
+    image6 = gaussian_blur(image6, 5);
+    image6 = otsu(image6,20);
+    save(image6, "generated6.jpeg");
+    printf("blur -> picture saved\n");
     return 0;
 }

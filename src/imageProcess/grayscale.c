@@ -55,7 +55,7 @@ int otsu_threshold(int* A, int N){
     return (int) threshold;
 }
 
-void otsu_transform(SDL_Surface* image){
+void otsu_transform(SDL_Surface* image, int decallage){
     const SDL_Color black = to_color(0,0,0,255);
     const SDL_Color white = to_color(255,255,255,255);
 
@@ -63,13 +63,13 @@ void otsu_transform(SDL_Surface* image){
     int A[256];
     for(size_t i = 0; i < 256; i++)
         A[i] = 0;
-    
+
     otsu_histogram(image, A);
 
     int threshold = otsu_threshold(A, height*width);
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
-            if(get_pixel(image, i, j).r > threshold)
+            if(get_pixel(image, i, j).r < threshold - decallage)
                 set_pixel(image, i, j, black);
             else
                 set_pixel(image, i, j, white);
@@ -77,8 +77,8 @@ void otsu_transform(SDL_Surface* image){
     }
 }
 
-SDL_Surface* otsu(SDL_Surface* input){
+SDL_Surface* otsu(SDL_Surface* input, int decallage){
     SDL_Surface* output = to_grayscale(input);
-    otsu_transform(output);
+    otsu_transform(output, decallage);
     return output;
 }
