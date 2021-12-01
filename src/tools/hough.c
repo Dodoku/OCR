@@ -85,6 +85,13 @@ void line_trace(SDL_Surface* input, double theta, double rho){
     }
 }
 
+int get_intersection(size_t rho1, size_t rho2, size_t theta1, size_t theta2){
+    double rho_1 = (double) rho1, rho_2 = (double) rho2;
+    double theta_1 = (double) theta1, theta_2 = (double) theta2;
+    
+
+}
+
 void hough_trace(int** A, double x, double y, size_t rhomax){
     double rho, theta;
     for(size_t t = 0; t < tmax; t++){
@@ -128,7 +135,22 @@ double hough_transform(SDL_Surface* input){
         }
     }
 
-    // 4th step - Find all intersection function
+    // 4th step - Find all intersection point
+    size_t* xlist = calloc(0, sizeof(size_t));
+    size_t* ylist = calloc(0, sizeof(size_t));
+    size_t length2 = 0;
+
+    for(size_t i = 0; i < length; i++){
+        for(size_t j = i+1; j < length; j++){
+            if(get_intersection(rholist[i], rholist[j], thetalist[i], thetalist[j])){
+                
+            }
+        }
+    }
+
+    // test interaction function
+    for (size_t i = 0; i < length2; i++)
+        set_pixel(input, xlist[i], ylist[i], to_color(0,0,255,255))
 
     // 5th step - Get the index of the highest and lowest interaction function
 
@@ -139,7 +161,7 @@ double hough_transform(SDL_Surface* input){
     // nth step - Free dynamic memory allocation
     double thetamin = 0;
     if (length != 0)
-        thetamin = thetalist[0];
+        thetamin = thetalist[0]*(M_PI/180);
     free(thetalist);
     free(rholist);
     free_matrice(A);
