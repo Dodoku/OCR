@@ -14,8 +14,8 @@ OBJ_DIR = $(BUILD_DIR)/obj
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -g -fsanitize=address $(shell sdl2-config --cflags) `pkg-config --cflags gtk+-3.0`
-LDFLAGS = -export-dynamic -fsanitize=address $(shell sdl2-config --libs) -lm -lSDL2_image `pkg-config --libs gtk+-3.0`
+CFLAGS = -Wall -Wextra -g -fsanitize=address -pthread $(shell sdl2-config --cflags) `pkg-config --cflags gtk+-3.0`
+LDFLAGS = -export-dynamic -fsanitize=address -pthread $(shell sdl2-config --libs) -lm -lSDL2_image `pkg-config --libs gtk+-3.0`
 
 ALLFILES = $(shell find . -name "*.[ch]")
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
