@@ -94,7 +94,7 @@ Uint32 color_to_int(SDL_Color color) {
                      + (color.a << 24));
 }
 
-/*
+/**
  * rescale the picture
  * @param image (SDL_Surface*) : the picture to rescale
  * @param w,h (int) : the new sclale of the picure

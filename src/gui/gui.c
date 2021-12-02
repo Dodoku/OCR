@@ -1,5 +1,9 @@
+#include <unistd.h>
+#include <stdio.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <gtk/gtk.h>
+#include <string.h>
 #include <pthread.h>
 #include <math.h>
 
@@ -8,6 +12,10 @@
 #include "train_gui.h"
 
 #include "../imageProcess/rotate.h"
+#include "../imageProcess/rotate.h"
+#include "../imageProcess/contrast.h"
+#include "../imageProcess/grayscale.h"
+#include "../imageProcess/noise_reduction.h"
 
 void error_message(char *message)
 {
@@ -65,8 +73,31 @@ GdkPixbuf *gtk_image_new_from_sdl_surface (SDL_Surface *surface)
 struct gui_data *data;
 
 //------------------------------------------------------------------------------
-// Thread to update the gui
+// THREADS
 //------------------------------------------------------------------------------
+
+static void* refresh_image_filter(void * p_data){
+    struct filter_data *fdata = (struct filter_data*)p_data;
+    GtkImage* filterImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
+                                                            "filter_image"));
+
+    if(fdata->grayscale)
+        data->editedImage = to_grayscale(data->editedImage);
+    if(fdata->blur)
+        data->editedImage = gaussian_blur(data->editedImage, fdata->blur);
+    if(fdata->otsu)
+        data->editedImage = otsu(data->editedImage);
+
+    GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->editedImage);
+
+    int width = gdk_pixbuf_get_width (pixbuf);
+    int height = gdk_pixbuf_get_height (pixbuf);
+    width = (double)width * ((double)250/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 250, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(filterImage, pixbuf);
+    free(fdata);
+    return NULL;
+}
 
 static void* refresh_image_rotate(void * p_data){
     int angle = *((int*)p_data);
@@ -83,8 +114,24 @@ static void* refresh_image_rotate(void * p_data){
     width = (double)width * ((double)300/height);
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 300, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(rotateImage, pixbuf);
+
+
+    struct filter_data *fdata = malloc(sizeof(struct filter_data));
+    GtkSwitch *grayscaleToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
+                                                            "grayscale_switch"));
+    GtkSpinButton *blurSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "nbblur"));
+    GtkSpinButton *ostuSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "nbotsu"));
+
+    fdata->grayscale = gtk_switch_get_active(grayscaleToggle);
+    fdata->blur = gtk_spin_button_get_value(blurSpin);
+    fdata->otsu = gtk_spin_button_get_value(ostuSpin);
+
+    pthread_create(&data->thread, NULL, refresh_image_filter, fdata);
     return NULL;
 }
+
 //------------------------------------------------------------------------------
 // EVENTS
 //------------------------------------------------------------------------------
@@ -109,6 +156,7 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
 
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button));
     Data->loadImage = load(filename);
+    Data->editedImage = copy(Data->loadImage);
     int *angle = malloc(sizeof(int));
     *angle = -999;
     pthread_create(&data->thread, NULL, refresh_image_rotate, angle);
@@ -121,6 +169,10 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     gtk_widget_set_sensitive(confirmButton, TRUE);
     gtk_widget_set_sensitive(stack, TRUE);
 }
+
+//------------------------------------------------------------------------------
+// MAIN FUNCTION
+//------------------------------------------------------------------------------
 
 GtkBuilder *init_gui(){
     // Initializes GTK.
@@ -147,8 +199,18 @@ GtkBuilder *init_gui(){
                                                             "org.dodoku.main"));
     GtkFileChooserButton* chooserButton = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, 
                                                             "filename"));
+    GtkFileChooserButton* chooserNetworkButton = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, 
+                                                            "network_data_file"));
     GtkButton* apply_rotate = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "apply_rotate"));
+    GtkButton* apply_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
+                                                            "apply_filter"));
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        strcat(cwd, "/res/record.data");
+        gtk_file_chooser_set_filename (GTK_FILE_CHOOSER(chooserNetworkButton), cwd);
+    }
+    
 
     if (gtk_window_set_icon_from_file(mainWindow, "res/logo.png", &error) == 0)
     {
@@ -165,6 +227,7 @@ GtkBuilder *init_gui(){
                                     "activate", G_CALLBACK(open_train_gui), builder);
     g_signal_connect(chooserButton, "file-set", G_CALLBACK(load_image), data);
     g_signal_connect(apply_rotate, "clicked", G_CALLBACK(rotate_update), data);
+    g_signal_connect(apply_filter, "clicked", G_CALLBACK(rotate_update), data);
 
 
     // Run the main window.

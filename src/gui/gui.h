@@ -14,6 +14,13 @@ struct gui_data {
     pthread_t thread;
 };
 
+struct filter_data {
+    int grayscale;
+
+    int blur;
+    int otsu;
+};
+
 void error_message(char *message);
 void info_message(char *message);
 

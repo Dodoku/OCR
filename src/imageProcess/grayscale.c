@@ -10,6 +10,13 @@ SDL_Color grayscale(SDL_Color color) {
     return to_color(value, value, value, color.a);
 }
 
+/**
+ * @brief Convert an image to grayscale
+ * /!\ IMAGE IS DESTROYED /!\
+ * @param image (SDL_Surface*) The image to convert
+ * @return SDL_Surface* grayscale image
+ * @author Nicolas Prevost
+ */
 SDL_Surface* to_grayscale(SDL_Surface* image){
     SDL_Surface *result = create_empty(image->w, image->h);
     for (int i = 0; i < image->w; i++) {
@@ -19,6 +26,7 @@ SDL_Surface* to_grayscale(SDL_Surface* image){
             set_pixel(result, i, j, color);
         }
     }
+    SDL_FreeSurface(image);
     return result;
 }
 

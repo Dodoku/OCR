@@ -4,7 +4,6 @@
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">25</property>
-    <property name="value">4</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
@@ -19,6 +18,11 @@
     <property name="value">10</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
+  </object>
+  <object class="GtkFileFilter" id="dataFilter">
+    <patterns>
+      <pattern>*.data</pattern>
+    </patterns>
   </object>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
@@ -282,10 +286,11 @@
                             </child>
                             <child>
                               <object class="GtkAlignment">
-                                <property name="width-request">610</property>
+                                <property name="width-request">494</property>
                                 <property name="height-request">350</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
+                                <property name="margin-end">124</property>
                                 <child>
                                   <object class="GtkImage" id="rotate_image">
                                     <property name="height-request">300</property>
@@ -411,7 +416,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkButton" id="applyfilter">
+                              <object class="GtkButton" id="apply_filter">
                                 <property name="label" translatable="yes">Apply Edit</property>
                                 <property name="width-request">100</property>
                                 <property name="visible">True</property>
@@ -437,7 +442,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSpinButton" id="nbblur1">
+                              <object class="GtkSpinButton" id="nbotsu">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="text" translatable="yes">4</property>
@@ -450,7 +455,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSwitch" id="grayscaleswitch">
+                              <object class="GtkSwitch" id="grayscale_switch">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="margin-top">5</property>
@@ -557,7 +562,39 @@
                         <property name="can-focus">False</property>
                         <property name="left-padding">12</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkFixed" id="fixed4">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <child>
+                              <object class="GtkFileChooserButton" id="network_data_file">
+                                <property name="width-request">200</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="filter">dataFilter</property>
+                                <property name="title" translatable="yes">Load .data File</property>
+                              </object>
+                              <packing>
+                                <property name="x">250</property>
+                                <property name="y">30</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="greyscale1">
+                                <property name="width-request">100</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="margin-top">7</property>
+                                <property name="label" translatable="yes">Trained Network</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="x">100</property>
+                                <property name="y">30</property>
+                              </packing>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
@@ -611,19 +648,6 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkImage" id="image2">
-                                <property name="width-request">100</property>
-                                <property name="height-request">80</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="stock">gtk-refresh</property>
-                              </object>
-                              <packing>
-                                <property name="x">250</property>
-                                <property name="y">150</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkButton" id="save_image_button">
                                 <property name="label" translatable="yes">Save Image</property>
                                 <property name="width-request">200</property>
@@ -652,6 +676,26 @@
                               <packing>
                                 <property name="x">350</property>
                                 <property name="y">350</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkAlignment">
+                                <property name="width-request">610</property>
+                                <property name="height-request">300</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkImage" id="image2">
+                                    <property name="width-request">100</property>
+                                    <property name="height-request">80</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="stock">gtk-missing-image</property>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="y">40</property>
                               </packing>
                             </child>
                           </object>
