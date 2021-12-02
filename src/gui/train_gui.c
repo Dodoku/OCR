@@ -133,10 +133,10 @@ void start_train_button(GtkButton *start_train, gpointer user_data){
     }
 }
 
-void open_train_gui(GtkButton *button, gpointer user_data){
+void open_train_gui(GtkMenuItem *button, gpointer user_data){
     GtkBuilder *builder =  user_data;
     GError* error = NULL;
-    gtk_button_get_event_window (button);
+    gtk_menu_item_get_label(button);
 
     if (gtk_builder_add_from_file(builder, "res/dodoku_train.glade", &error) == 0)
     {

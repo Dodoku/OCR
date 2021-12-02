@@ -22,6 +22,18 @@ SDL_Surface *create_empty(int w, int h) {
 }
 
 /*
+ * create a new SDL surface from another one
+ * @param src (SDL_Surface*) : source surface
+ * @return (SDL_Surface*) : the new surface
+ * @author Valentin Uhlrich
+ */
+SDL_Surface *copy(SDL_Surface* src) {
+    SDL_Surface *dest = create_empty(src->w, src->h);
+    SDL_BlitSurface(src, &src->clip_rect, dest, &dest->clip_rect);
+    return dest;
+}
+
+/*
  * try to load a picture from the path
  * @param path (char*) : the path of the picture
  * @return (SDL_Surface*) : the loaded surface

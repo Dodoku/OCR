@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 SDL_Surface *create_empty(int w, int h);
+SDL_Surface *copy(SDL_Surface* src);
 
 SDL_Surface *load(char *path);
 void save(SDL_Surface *image, char *path);
