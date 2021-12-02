@@ -15,4 +15,6 @@ void otsu_histogram(SDL_Surface* image, int* A);
 
 SDL_Surface* otsu(SDL_Surface* input, int decallage);
 
+SDL_Surface* adaptative_treashold(SDL_Surface* image);
+
 #endif
