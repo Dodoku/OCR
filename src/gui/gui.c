@@ -80,7 +80,10 @@ static void* refresh_image_filter(void * p_data){
     struct filter_data *fdata = (struct filter_data*)p_data;
     GtkImage* filterImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
                                                             "filter_image"));
+    if(data->editedImage != NULL)
+        SDL_FreeSurface(data->editedImage);
 
+    data->editedImage = copy(data->rotateImage);
     if(fdata->grayscale)
         data->editedImage = to_grayscale(data->editedImage);
     if(fdata->blur)
@@ -104,10 +107,12 @@ static void* refresh_image_rotate(void * p_data){
     free((int*)p_data);
     GtkImage* rotateImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
                                                             "rotate_image"));
-    data->editedImage = copy(data->loadImage);
+    if(data->rotateImage != NULL)
+        SDL_FreeSurface(data->rotateImage);
+    data->rotateImage = copy(data->loadImage);
     if(angle >= -180 && angle <= 180)
-        data->editedImage = rotate(data->editedImage, angle*M_PI/180);
-    GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->editedImage);
+        data->rotateImage = rotate(data->rotateImage, angle*M_PI/180);
+    GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->rotateImage);
 
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
@@ -132,6 +137,17 @@ static void* refresh_image_rotate(void * p_data){
     return NULL;
 }
 
+
+static gboolean cropUpdate(gpointer g_data){
+    /*GtkFixed *fixed = g_data;
+    if(data->pressed != NULL){
+        gint x, y;
+        gdk_window_get_device_position(GTK_WIDGET(fixed), &x, &y);
+        gtk_fixed_move(fixed, data->pressed, x, y);
+    }*/
+    return FALSE;
+}
+
 //------------------------------------------------------------------------------
 // EVENTS
 //------------------------------------------------------------------------------
@@ -154,9 +170,20 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     if(Data->editedImage != NULL)
         SDL_FreeSurface(Data->editedImage);
 
+    if(Data->rotateImage != NULL)
+        SDL_FreeSurface(Data->rotateImage);
+
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button));
     Data->loadImage = load(filename);
     Data->editedImage = copy(Data->loadImage);
+    Data->rotateImage = copy(Data->loadImage);
+    
+    Data->minX = 0;
+    Data->minY = 0;
+
+    Data->maxX = Data->loadImage->w;
+    Data->maxY = Data->loadImage->h;
+
     int *angle = malloc(sizeof(int));
     *angle = -999;
     pthread_create(&data->thread, NULL, refresh_image_rotate, angle);
@@ -170,6 +197,20 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     gtk_widget_set_sensitive(stack, TRUE);
 }
 
+void cropPress(GtkButton *button){
+    GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(data->builder, 
+                                                            "cropFixed"));
+    cropRelase();
+    data->pressed = button;
+    data->event = g_timeout_add(500, cropUpdate, fixed);
+}
+
+void cropRelase(){
+    data->pressed = NULL;
+    if(data->event > 0)
+        g_source_remove(data->event);
+    data->event = 0;
+}
 //------------------------------------------------------------------------------
 // MAIN FUNCTION
 //------------------------------------------------------------------------------
@@ -193,6 +234,9 @@ GtkBuilder *init_gui(){
     data->builder = builder;
     data->loadImage = NULL;
     data->editedImage = NULL;
+    data->rotateImage = NULL;
+    data->pressed = NULL;
+    data->event = 0;
 
     // Gets the widgets.
     GtkWindow* mainWindow = GTK_WINDOW(gtk_builder_get_object(builder, 
@@ -205,6 +249,9 @@ GtkBuilder *init_gui(){
                                                             "apply_rotate"));
     GtkButton* apply_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "apply_filter"));
+    data->mainWindow = mainWindow;
+
+    
     char cwd[PATH_MAX];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
         strcat(cwd, "/res/record.data");
@@ -228,6 +275,12 @@ GtkBuilder *init_gui(){
     g_signal_connect(chooserButton, "file-set", G_CALLBACK(load_image), data);
     g_signal_connect(apply_rotate, "clicked", G_CALLBACK(rotate_update), data);
     g_signal_connect(apply_filter, "clicked", G_CALLBACK(rotate_update), data);
+
+    // Crop
+    g_signal_connect(GTK_BUTTON(gtk_builder_get_object(builder, "crop1")), 
+                                            "pressed", G_CALLBACK(cropPress), data);
+    g_signal_connect(GTK_BUTTON(gtk_builder_get_object(builder, "crop2")), 
+                                            "pressed", G_CALLBACK(cropRelase), data);
 
 
     // Run the main window.

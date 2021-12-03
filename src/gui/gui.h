@@ -10,8 +10,20 @@ struct gui_data {
     SDL_Surface *loadImage;
 
     SDL_Surface *editedImage;
+    SDL_Surface *rotateImage;
+
+    int minX;
+    int minY;
+
+    int maxX;
+    int maxY;
+
+    GtkButton *pressed;
+    guint event;
 
     pthread_t thread;
+
+    GtkWindow *mainWindow;
 };
 
 struct filter_data {
