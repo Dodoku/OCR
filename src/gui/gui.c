@@ -101,6 +101,11 @@ static void* refresh_image_filter(void * p_data){
     struct filter_data *fdata = (struct filter_data*)p_data;
     GtkImage* filterImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
                                                             "filter_image"));
+
+    GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "apply_filter"));
+
+    gtk_widget_set_sensitive(apply_filter, FALSE);
     if(data->editedImage != NULL)
         SDL_FreeSurface(data->editedImage);
 
@@ -110,7 +115,7 @@ static void* refresh_image_filter(void * p_data){
     if(fdata->blur)
         data->editedImage = gaussian_blur(data->editedImage, fdata->blur);
     if(fdata->otsu)
-        data->editedImage = otsu(data->editedImage);
+        data->editedImage = otsu(data->editedImage, fdata->otsu);
 
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->editedImage);
     int width = gdk_pixbuf_get_width (pixbuf);
@@ -119,6 +124,7 @@ static void* refresh_image_filter(void * p_data){
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 450, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(filterImage, pixbuf);
     free(fdata);
+    gtk_widget_set_sensitive(apply_filter, TRUE);
     pthread_create(&data->thread, NULL, refresh_image_split, NULL);
     return NULL;
 }
@@ -128,6 +134,13 @@ static void* refresh_image_rotate(void * p_data){
     free((int*)p_data);
     GtkImage* rotateImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
                                                             "rotate_image"));
+
+    GtkWidget* apply_rotate = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "apply_rotate"));
+    GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "apply_filter"));
+    gtk_widget_set_sensitive(apply_rotate, FALSE);
+    gtk_widget_set_sensitive(apply_filter, FALSE);
     if(data->rotateImage != NULL)
         SDL_FreeSurface(data->rotateImage);
     data->rotateImage = copy(data->loadImage);
@@ -141,7 +154,16 @@ static void* refresh_image_rotate(void * p_data){
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 500, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(rotateImage, pixbuf);
 
+    gtk_widget_set_sensitive(apply_rotate, TRUE);
+    filter_update();
+    return NULL;
+}
 
+//------------------------------------------------------------------------------
+// EVENTS
+//------------------------------------------------------------------------------
+
+void filter_update(){
     struct filter_data *fdata = malloc(sizeof(struct filter_data));
     GtkSwitch *grayscaleToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
                                                             "grayscale_switch"));
@@ -155,19 +177,13 @@ static void* refresh_image_rotate(void * p_data){
     fdata->otsu = gtk_spin_button_get_value(ostuSpin);
 
     pthread_create(&data->thread, NULL, refresh_image_filter, fdata);
-    return NULL;
 }
-
-//------------------------------------------------------------------------------
-// EVENTS
-//------------------------------------------------------------------------------
 
 void rotate_update(){
     GtkRange *scale = GTK_RANGE(gtk_builder_get_object(data->builder, "rotation_slider"));
     int *angle = malloc(sizeof(int));
     *angle = gtk_range_get_value(scale);
-    
-    pthread_cancel(data->thread);
+
     pthread_create(&data->thread, NULL, refresh_image_rotate, angle);
 }
 
@@ -275,7 +291,7 @@ GtkBuilder *init_gui(){
                                     "activate", G_CALLBACK(open_train_gui), builder);
     g_signal_connect(chooserButton, "file-set", G_CALLBACK(load_image), data);
     g_signal_connect(apply_rotate, "clicked", G_CALLBACK(rotate_update), data);
-    g_signal_connect(apply_filter, "clicked", G_CALLBACK(rotate_update), data);
+    g_signal_connect(apply_filter, "clicked", G_CALLBACK(filter_update), data);
 
 
     // Run the main window.

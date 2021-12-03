@@ -77,7 +77,7 @@ void otsu_transform(SDL_Surface* image, int decallage){
     int threshold = otsu_threshold(A, height*width);
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
-            if(get_pixel(image, i, j).r < threshold - decallage)
+            if(get_pixel(image, i, j).r > threshold - decallage)
                 set_pixel(image, i, j, black);
             else
                 set_pixel(image, i, j, white);

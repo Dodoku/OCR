@@ -37,6 +37,8 @@ struct filter_data {
 void error_message(char *message);
 void info_message(char *message);
 
+void filter_update();
+
 GtkBuilder *init_gui();
 
 
