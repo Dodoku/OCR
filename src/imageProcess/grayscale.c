@@ -63,7 +63,7 @@ int otsu_threshold(int* A, int N){
     return (int) threshold;
 }
 
-void otsu_transform(SDL_Surface* image){
+void otsu_transform(SDL_Surface* image, int decallage){
     const SDL_Color black = to_color(0,0,0,255);
     const SDL_Color white = to_color(255,255,255,255);
 
@@ -71,13 +71,13 @@ void otsu_transform(SDL_Surface* image){
     int A[256];
     for(size_t i = 0; i < 256; i++)
         A[i] = 0;
-    
+
     otsu_histogram(image, A);
 
     int threshold = otsu_threshold(A, height*width);
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
-            if(get_pixel(image, i, j).r > threshold)
+            if(get_pixel(image, i, j).r < threshold - decallage)
                 set_pixel(image, i, j, black);
             else
                 set_pixel(image, i, j, white);
@@ -85,8 +85,74 @@ void otsu_transform(SDL_Surface* image){
     }
 }
 
-SDL_Surface* otsu(SDL_Surface* input){
+SDL_Surface* otsu(SDL_Surface* input, int decallage)
+{
     SDL_Surface* output = to_grayscale(input);
-    otsu_transform(output);
+    otsu_transform(output, decallage);
     return output;
+}
+
+SDL_Color get_pixel2(SDL_Surface* image, int x, int y)
+{
+    if(x<0)
+        x=0;
+    if(x>=image->w)
+        x=image->w-1;
+    if(y<0)
+        y=0;
+    if(y>=image->h)
+        y=image->h-1;
+    return get_pixel(image,x,y);
+}
+
+SDL_Surface* adaptative_treashold(SDL_Surface* image)
+{
+    int w=image->w;
+    int h=image->h;
+    int s=w/8;
+    int t=15;
+
+
+    int sum;
+    SDL_Surface* out = create_empty(w,h);
+    for(int i=0; i<w;i++)
+    {
+        sum=0;
+        for(int j=0;j<h;j++)
+        {
+            sum+=get_pixel(image,i,j).r;
+            if(i==0)
+            {
+                set_pixel(image,i,j,to_color(sum,sum,sum,255));
+            }
+            else
+            {
+                set_pixel(image,i,j,to_color(get_pixel(image,i-1,j).r+sum,get_pixel(image,i-1,j).g+sum,get_pixel(image,i-1,j).b+sum,255));
+            }
+        }
+    }
+    int x1,x2,y1,y2,count;
+    for(int i=0; i<w;i++)
+    {
+        for(int j=0;j<h;j++)
+        {
+            x1=i-s/2;
+            x2=i+s/2;
+            y1=j-s/2;
+            y2=j+s/2;
+            //printf("%d %d %d %d\n",x1,x2,y1,y2 );
+            count=(x2-x1)*(y2-y1);
+            sum=get_pixel2(image,x2,y2).r-get_pixel2(image,x2,y1-1).r-get_pixel2(image,x1-1,y2).r+get_pixel2(image,x1-1,y1-1).r;
+            printf("%d %d \n",get_pixel(image,i,j).r*count,sum*(100-t)/100 );
+            if(get_pixel(image,i,j).r*count <= sum*(100-t)/100)
+            {
+                set_pixel(out,i,j,to_color(0,0,0,255));
+            }
+            else
+            {
+                set_pixel(out,i,j,to_color(255,255,255,255));
+            }
+        }
+    }
+    return out;
 }
