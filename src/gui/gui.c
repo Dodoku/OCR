@@ -17,6 +17,8 @@
 #include "../imageProcess/grayscale.h"
 #include "../imageProcess/noise_reduction.h"
 
+#include "../tools/hough.h"
+
 void error_message(char *message)
 {
     GtkWidget *dialog;
@@ -60,7 +62,7 @@ GdkPixbuf *gtk_image_new_from_sdl_surface (SDL_Surface *surface)
     rowstride = gdk_pixbuf_get_rowstride (pixbuf);
     pixels = gdk_pixbuf_get_pixels (pixbuf);
 
-    // copy pixels                                                              
+    // copy pixels                            
     SDL_LockSurface(surface);
     SDL_ConvertPixels (surface->w, surface->h, src_format,
                surface->pixels, surface->pitch,
@@ -75,6 +77,25 @@ struct gui_data *data;
 //------------------------------------------------------------------------------
 // THREADS
 //------------------------------------------------------------------------------
+
+static void* refresh_image_split(){
+    GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "splitting_image"));
+
+
+    if(data->slipImage != NULL)
+        SDL_FreeSurface(data->slipImage);
+
+    data->slipImage = copy(data->editedImage);
+    hough_transform(data->slipImage);
+
+    GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->slipImage);
+    int width = gdk_pixbuf_get_width (pixbuf);
+    int height = gdk_pixbuf_get_height (pixbuf);
+    width = (double)width * ((double)600/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 600, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(image, pixbuf);
+    return NULL;
+}
 
 static void* refresh_image_filter(void * p_data){
     struct filter_data *fdata = (struct filter_data*)p_data;
@@ -92,13 +113,13 @@ static void* refresh_image_filter(void * p_data){
         data->editedImage = otsu(data->editedImage);
 
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->editedImage);
-
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
-    width = (double)width * ((double)250/height);
-    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 250, GDK_INTERP_BILINEAR);
+    width = (double)width * ((double)450/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 450, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(filterImage, pixbuf);
     free(fdata);
+    pthread_create(&data->thread, NULL, refresh_image_split, NULL);
     return NULL;
 }
 
@@ -116,8 +137,8 @@ static void* refresh_image_rotate(void * p_data){
 
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
-    width = (double)width * ((double)300/height);
-    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 300, GDK_INTERP_BILINEAR);
+    width = (double)width * ((double)500/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 500, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(rotateImage, pixbuf);
 
 
@@ -135,17 +156,6 @@ static void* refresh_image_rotate(void * p_data){
 
     pthread_create(&data->thread, NULL, refresh_image_filter, fdata);
     return NULL;
-}
-
-
-static gboolean cropUpdate(gpointer g_data){
-    /*GtkFixed *fixed = g_data;
-    if(data->pressed != NULL){
-        gint x, y;
-        gdk_window_get_device_position(GTK_WIDGET(fixed), &x, &y);
-        gtk_fixed_move(fixed, data->pressed, x, y);
-    }*/
-    return FALSE;
 }
 
 //------------------------------------------------------------------------------
@@ -173,10 +183,14 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     if(Data->rotateImage != NULL)
         SDL_FreeSurface(Data->rotateImage);
 
+    if(Data->slipImage != NULL)
+        SDL_FreeSurface(Data->slipImage);
+    
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button));
     Data->loadImage = load(filename);
     Data->editedImage = copy(Data->loadImage);
     Data->rotateImage = copy(Data->loadImage);
+    Data->slipImage = copy(Data->loadImage);
     
     Data->minX = 0;
     Data->minY = 0;
@@ -197,20 +211,6 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     gtk_widget_set_sensitive(stack, TRUE);
 }
 
-void cropPress(GtkButton *button){
-    GtkFixed *fixed = GTK_FIXED(gtk_builder_get_object(data->builder, 
-                                                            "cropFixed"));
-    cropRelase();
-    data->pressed = button;
-    data->event = g_timeout_add(500, cropUpdate, fixed);
-}
-
-void cropRelase(){
-    data->pressed = NULL;
-    if(data->event > 0)
-        g_source_remove(data->event);
-    data->event = 0;
-}
 //------------------------------------------------------------------------------
 // MAIN FUNCTION
 //------------------------------------------------------------------------------
@@ -235,6 +235,7 @@ GtkBuilder *init_gui(){
     data->loadImage = NULL;
     data->editedImage = NULL;
     data->rotateImage = NULL;
+    data->slipImage = NULL;
     data->pressed = NULL;
     data->event = 0;
 
@@ -275,12 +276,6 @@ GtkBuilder *init_gui(){
     g_signal_connect(chooserButton, "file-set", G_CALLBACK(load_image), data);
     g_signal_connect(apply_rotate, "clicked", G_CALLBACK(rotate_update), data);
     g_signal_connect(apply_filter, "clicked", G_CALLBACK(rotate_update), data);
-
-    // Crop
-    g_signal_connect(GTK_BUTTON(gtk_builder_get_object(builder, "crop1")), 
-                                            "pressed", G_CALLBACK(cropPress), data);
-    g_signal_connect(GTK_BUTTON(gtk_builder_get_object(builder, "crop2")), 
-                                            "pressed", G_CALLBACK(cropRelase), data);
 
 
     // Run the main window.
