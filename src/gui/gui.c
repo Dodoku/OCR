@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
 #include <string.h>
 #include <pthread.h>
@@ -105,7 +106,6 @@ static void* refresh_image_filter(void * p_data){
     GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
                                                             "apply_filter"));
 
-    gtk_widget_set_sensitive(apply_filter, FALSE);
     if(data->editedImage != NULL)
         SDL_FreeSurface(data->editedImage);
 
@@ -124,7 +124,6 @@ static void* refresh_image_filter(void * p_data){
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 450, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(filterImage, pixbuf);
     free(fdata);
-    gtk_widget_set_sensitive(apply_filter, TRUE);
     pthread_create(&data->thread, NULL, refresh_image_split, NULL);
     return NULL;
 }
@@ -139,10 +138,8 @@ static void* refresh_image_rotate(void * p_data){
                                                             "apply_rotate"));
     GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
                                                             "apply_filter"));
-    gtk_widget_set_sensitive(apply_rotate, FALSE);
-    gtk_widget_set_sensitive(apply_filter, FALSE);
     if(data->rotateImage != NULL)
-        SDL_FreeSurface(data->rotateImage);
+       SDL_FreeSurface(data->rotateImage);
     data->rotateImage = copy(data->loadImage);
     if(angle >= -180 && angle <= 180)
         data->rotateImage = rotate(data->rotateImage, angle*M_PI/180);
@@ -154,7 +151,6 @@ static void* refresh_image_rotate(void * p_data){
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 500, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(rotateImage, pixbuf);
 
-    gtk_widget_set_sensitive(apply_rotate, TRUE);
     filter_update();
     return NULL;
 }
@@ -176,6 +172,11 @@ void filter_update(){
     fdata->blur = gtk_spin_button_get_value(blurSpin);
     fdata->otsu = gtk_spin_button_get_value(ostuSpin);
 
+
+
+    if(data->inThread)
+        pthread_exit(data->thread);
+    data->inThread = 1;
     pthread_create(&data->thread, NULL, refresh_image_filter, fdata);
 }
 
@@ -184,6 +185,10 @@ void rotate_update(){
     int *angle = malloc(sizeof(int));
     *angle = gtk_range_get_value(scale);
 
+    if(data->inThread){
+        pthread_exit(data->thread);
+    }
+    data->inThread = 1;
     pthread_create(&data->thread, NULL, refresh_image_rotate, angle);
 }
 
@@ -222,7 +227,6 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
                                                             "confirmbutton"));
     GtkWidget* stack = GTK_WIDGET(gtk_builder_get_object(Data->builder, 
                                                             "stack1"));
-
     gtk_widget_set_sensitive(confirmButton, TRUE);
     gtk_widget_set_sensitive(stack, TRUE);
 }
@@ -254,6 +258,7 @@ GtkBuilder *init_gui(){
     data->slipImage = NULL;
     data->pressed = NULL;
     data->event = 0;
+    data->inThread = 0;
 
     // Gets the widgets.
     GtkWindow* mainWindow = GTK_WINDOW(gtk_builder_get_object(builder, 
@@ -273,14 +278,6 @@ GtkBuilder *init_gui(){
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
         strcat(cwd, "/res/record.data");
         gtk_file_chooser_set_filename (GTK_FILE_CHOOSER(chooserNetworkButton), cwd);
-    }
-    
-
-    if (gtk_window_set_icon_from_file(mainWindow, "res/logo.png", &error) == 0)
-    {
-        g_printerr("Error loading file: %s\n", error->message);
-        g_clear_error(&error);
-        return NULL;
     }
 
     // Connects event handlers.

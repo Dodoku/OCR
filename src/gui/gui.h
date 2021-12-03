@@ -22,6 +22,7 @@ struct gui_data {
     GtkButton *pressed;
     guint event;
 
+    int inThread;
     pthread_t thread;
 
     GtkWindow *mainWindow;
