@@ -70,9 +70,9 @@ void otsu_transform(SDL_Surface* image){
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
             if(get_pixel(image, i, j).r > threshold)
-                set_pixel(image, i, j, black);
-            else
                 set_pixel(image, i, j, white);
+            else
+                set_pixel(image, i, j, black);
         }
     }
 }
