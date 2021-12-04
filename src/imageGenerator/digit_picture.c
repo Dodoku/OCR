@@ -49,47 +49,16 @@ void display_digit(SDL_Surface *image, int x, int y, int n, SDL_Color color) {
             break;
     }
     for (int i = 0; i < 100; i++)
-    {
         for (int j = 0; j < 100; j++)
-        {
-            if(get_pixel(number, i, j).r<200)
-            {
+            if(get_pixel(number, i, j).r<245)
                 set_pixel(image, x + i, y + j,color);
-            }
-        }
-    }
 }
-
-void init_grid_digit(char *path, int *grid) {
-    FILE *fp;
-    char c;
-
-    fp = fopen(path, "r");
-    if (!fp)
-        errx(1, "Couldn't open %s\n", path);
-
-    int i = 0;
-
-    while ((c = fgetc(fp)) != EOF) {
-        if (c == '.')
-            *(grid + i) = 0;
-        else if (c > '0' && c <= '9')
-            *(grid + i) = c - '0';
-        else if (c != '\n' && c != '\0' && c != ' ')
-            errx(1, "File doesn't respect the format");
-        else
-            continue;
-        i++;
-    }
-    fclose(fp);
-}
-
 
 /*
  * Draw the digit for each number in the sudoku
- * @param sudoku (int[]) : a path to a file that contains the sudoku data
- * @param path (char*) : a string that contains the path to save the generated
- * picture
+ * @param sudoku (char *) : the unsolved sudoku
+ * @param path (char*) : the solved sudoku
+ * return SDL+SDL_Surface
  * @authur Nicolas Prevost
  */
 
@@ -119,6 +88,7 @@ SDL_Surface* generate_digit_picture(char* sudoku, char* solved) {
             i++;
         }
     }
+
     SDL_Surface *image = create_empty(993, 993);
 
     SDL_Color red=to_color(0,0,255,0);
@@ -132,8 +102,7 @@ SDL_Surface* generate_digit_picture(char* sudoku, char* solved) {
     int horizontal = 0;
     int vertical = 0;
     for (int index = 0; index < 81; index++) {
-        display_digit(image, x, y, solvedgrid[index],solvedgrid[index]==grid[index]?red:black);
-        printf("%d - %d\n",grid[index],solvedgrid[index]);
+        display_digit(image, x, y, solvedgrid[index],solvedgrid[index]==grid[index]?black:red);
         horizontal++;
 
         if (horizontal == 3 || horizontal == 6 || horizontal == 9) {
