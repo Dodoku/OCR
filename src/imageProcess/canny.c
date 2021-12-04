@@ -126,11 +126,9 @@ void threeshold(SDL_Surface* input, int low, int high){
         }
     }
 }
-
+*/
 
 SDL_Surface* canny(SDL_Surface* input){
     SDL_Surface* gray = to_grayscale(input);
     return gaussian(gray,KERNEL);
 }
-
-*/

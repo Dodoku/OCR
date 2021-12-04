@@ -11,4 +11,6 @@ SDL_Color isedge(SDL_Surface* input, size_t x, size_t y);
 
 SDL_Surface* edgemap(SDL_Surface* input);
 
+SDL_Surface* canny(SDL_Surface* input);
+
 #endif
