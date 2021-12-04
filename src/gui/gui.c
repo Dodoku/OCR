@@ -100,8 +100,8 @@ static void* refresh_image_split(){
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->slipImage);
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
-    width = (double)width * ((double)600/height);
-    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 600, GDK_INTERP_BILINEAR);
+    width = (double)width * ((double)500/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 500, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(image, pixbuf);
     data->inThread = 0;
     return NULL;
