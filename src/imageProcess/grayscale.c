@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <err.h>
+#include <stdlib.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 
@@ -107,7 +108,7 @@ SDL_Surface* adaptative_treashold(SDL_Surface* image)
     int h=image->h;
     int s=w/8;
     int t=15;
-    long intImg[w*h];
+    long* intImg=calloc(h*w,sizeof(long));
 
     SDL_Surface* out = create_empty(w,h);
 
@@ -119,11 +120,11 @@ SDL_Surface* adaptative_treashold(SDL_Surface* image)
             sum+=get_pixel(image,i,j).r;
             if(i==0)
             {
-                intImg[i*w+j]=sum;
+                intImg[i*h+j]=sum;
             }
             else
             {
-                intImg[i*w+j]=intImg[(i-1)*w+j]+sum;
+                intImg[i*h+j]=intImg[(i-1)*h+j]+sum;
             }
         }
     }
@@ -138,7 +139,7 @@ SDL_Surface* adaptative_treashold(SDL_Surface* image)
             y1=check(j-s/2,h);
             y2=check(j+s/2,h);
             count=(x2-x1)*(y2-y1);
-            sum=intImg[check(x2,w)*w+check(y2,h)]-intImg[check(x2,w)*w+check(y1-1,h)]-intImg[check(x1-1,w)*w+check(y2,h)]+intImg[check(x1-1,w)*w+check(y1-1,h)];
+            sum=intImg[check(x2,w)*h+check(y2,h)]-intImg[check(x2,w)*h+check(y1-1,h)]-intImg[check(x1-1,w)*h+check(y2,h)]+intImg[check(x1-1,w)*h+check(y1-1,h)];
             if(get_pixel(image,i,j).r*count <= (sum*(100-t)/100))
             {
                 set_pixel(out,i,j,to_color(255,255,255,255));
