@@ -111,48 +111,32 @@ SDL_Surface* adaptative_treashold(SDL_Surface* image)
     int h=image->h;
     int s=w/8;
     int t=15;
+    int intImg[w][h];
 
-
-    int sum;
-    SDL_Surface* out = create_empty(w,h);
-    for(int i=0; i<w;i++)
+    int sum=0;
+    for(int i=0;i<w;i++)
     {
-        sum=0;
         for(int j=0;j<h;j++)
         {
-            sum+=get_pixel(image,i,j).r;
+            sum+=get_pixel(image,i,j);
             if(i==0)
             {
-                set_pixel(image,i,j,to_color(sum,sum,sum,255));
+                intImg[i][j]=sum;
             }
             else
             {
-                set_pixel(image,i,j,to_color(get_pixel(image,i-1,j).r+sum,get_pixel(image,i-1,j).g+sum,get_pixel(image,i-1,j).b+sum,255));
+                intImg[i][j]=intImg[i-1][j]+sum;
             }
         }
     }
-    int x1,x2,y1,y2,count;
-    for(int i=0; i<w;i++)
+
+    int x1,x2,y1,y2;
+    for(int i=0;i<w;i++)
     {
         for(int j=0;j<h;j++)
         {
-            x1=i-s/2;
-            x2=i+s/2;
-            y1=j-s/2;
-            y2=j+s/2;
-            //printf("%d %d %d %d\n",x1,x2,y1,y2 );
-            count=(x2-x1)*(y2-y1);
-            sum=get_pixel2(image,x2,y2).r-get_pixel2(image,x2,y1-1).r-get_pixel2(image,x1-1,y2).r+get_pixel2(image,x1-1,y1-1).r;
-            printf("%d %d \n",get_pixel(image,i,j).r*count,sum*(100-t)/100 );
-            if(get_pixel(image,i,j).r*count <= sum*(100-t)/100)
-            {
-                set_pixel(out,i,j,to_color(0,0,0,255));
-            }
-            else
-            {
-                set_pixel(out,i,j,to_color(255,255,255,255));
-            }
+            x1
         }
     }
-    return out;
+
 }
