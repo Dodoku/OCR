@@ -14,7 +14,7 @@
  * @authur Nicolas Prevost
  */
 
-void display_digit(SDL_Surface *image, int x, int y, int n) {
+void display_digit(SDL_Surface *image, int x, int y, int n, SDL_Color color) {
     SDL_Surface *number;
     switch (n) {
         case 1:
@@ -48,51 +48,52 @@ void display_digit(SDL_Surface *image, int x, int y, int n) {
             return;
             break;
     }
-    for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 100; j++) {
-            set_pixel(image, x + i, y + j, get_pixel(number, i, j));
-        }
-    }
+    for (int i = 0; i < 100; i++)
+        for (int j = 0; j < 100; j++)
+            if(get_pixel(number, i, j).r<245)
+                set_pixel(image, x + i, y + j,color);
 }
-
-void init_grid_digit(char *path, int *grid) {
-    FILE *fp;
-    char c;
-
-    fp = fopen(path, "r");
-    if (!fp)
-        errx(1, "Couldn't open %s\n", path);
-
-    int i = 0;
-
-    while ((c = fgetc(fp)) != EOF) {
-        if (c == '.')
-            *(grid + i) = 0;
-        else if (c > '0' && c <= '9')
-            *(grid + i) = c - '0';
-        else if (c != '\n' && c != '\0' && c != ' ')
-            errx(1, "File doesn't respect the format");
-        else
-            continue;
-        i++;
-    }
-    fclose(fp);
-}
-
 
 /*
  * Draw the digit for each number in the sudoku
- * @param sudoku (int[]) : a path to a file that contains the sudoku data
- * @param path (char*) : a string that contains the path to save the generated
- * picture
+ * @param sudoku (char *) : the unsolved sudoku
+ * @param path (char*) : the solved sudoku
+ * return SDL+SDL_Surface
  * @authur Nicolas Prevost
  */
 
-void generate_digit_picture(char* sudoku, char* path) {
+SDL_Surface* generate_digit_picture(char* sudoku, char* solved) {
 
     int grid[81] = {0};
-    init_grid_digit(sudoku, grid);
+    int solvedgrid[81] = {0};
+    int i=0,i2=0;
+    while(sudoku[i]!=0)
+    {
+        if(sudoku[i]==' '||sudoku[i]=='\n')
+        {
+            i++;
+        }
+        else
+        {
+            if(sudoku[i]=='.')
+            {
+                grid[i2]=0;
+            }
+            else
+            {
+                grid[i2]=sudoku[i]-'0';
+            }
+            solvedgrid[i2]=solved[i]-'0';
+            i2++;
+            i++;
+        }
+    }
+
     SDL_Surface *image = create_empty(993, 993);
+
+    SDL_Color red=to_color(0,0,255,0);
+    SDL_Color black=to_color(0,0,0,0);
+
     horizontal_wall(image, 0, 12);
     vertical_wall(image, 0, 12, 12);
 
@@ -101,7 +102,7 @@ void generate_digit_picture(char* sudoku, char* path) {
     int horizontal = 0;
     int vertical = 0;
     for (int index = 0; index < 81; index++) {
-        display_digit(image, x, y, grid[index]);
+        display_digit(image, x, y, solvedgrid[index],solvedgrid[index]==grid[index]?black:red);
         horizontal++;
 
         if (horizontal == 3 || horizontal == 6 || horizontal == 9) {
@@ -132,5 +133,5 @@ void generate_digit_picture(char* sudoku, char* path) {
         }
     }
 
-    save(image, path);
+    return image;
 }

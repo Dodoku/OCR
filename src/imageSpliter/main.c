@@ -9,17 +9,11 @@
 
 int main(int argc, char *argv[])
 {
-    char s[] = "2.jpeg";
-    for(int i=1;i<7;i++ )
-    {
-        s[0]=i+'0';
-        SDL_Surface* image = load(s);
-        printf(s );
-        printf("\n%f\n\n",90-hough_transform(image));
-        save(image, s);
+    SDL_Surface* image = load("tests/assets/image_01.jpeg");
+    insert_picture(image, 5,5,150,150,4);
+    save(image, "out.jpeg");
 
-        SDL_FreeSurface(image);
-    }
+    SDL_FreeSurface(image);
     return 0;
 
 }

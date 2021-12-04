@@ -65,6 +65,7 @@ SDL_Surface* edgemap(SDL_Surface* input){
     for (size_t i = 1; i < width+1; i++)
         for (size_t j = 1; j < height+1; j++)
             set_pixel(edge, i-1, j-1, isedge(input, i, j));
+    SDL_FreeSurface(input);
     return edge;
 }
 
@@ -125,11 +126,9 @@ void threeshold(SDL_Surface* input, int low, int high){
         }
     }
 }
-
+*/
 
 SDL_Surface* canny(SDL_Surface* input){
     SDL_Surface* gray = to_grayscale(input);
     return gaussian(gray,KERNEL);
 }
-
-*/
