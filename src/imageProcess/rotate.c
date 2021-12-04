@@ -36,7 +36,7 @@ SDL_Surface *rotate(SDL_Surface *image, double angle) {
                 set_pixel(ret, x, y, get_pixel(image, xs, ys));
             } else {
                 /* set target pixel (x,y) to some default background */
-                set_pixel(ret, x, y, to_color(255, 255, 255, 0));
+                set_pixel(ret, x, y, to_color(0, 0, 0, 0));
             }
         }
     }

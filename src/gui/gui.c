@@ -82,11 +82,18 @@ struct gui_data *data;
 static void* refresh_image_split(){
     GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "splitting_image"));
 
+    GtkSwitch *grayscaleToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
+                                                        "grayscale_switch"));
+    if(!gtk_switch_get_active(grayscaleToggle)){
+        gtk_image_set_from_file(image, NULL);
+        data->inThread = 0;
+        return NULL;
+    }
 
     if(data->slipImage != NULL)
         SDL_FreeSurface(data->slipImage);
 
-    data->slipImage = copy(data->editedImage);
+    data->slipImage = copy(data->rotateImage);
     hough_transform(data->slipImage);
 
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->slipImage);
@@ -95,6 +102,7 @@ static void* refresh_image_split(){
     width = (double)width * ((double)600/height);
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 600, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(image, pixbuf);
+    data->inThread = 0;
     return NULL;
 }
 
@@ -109,7 +117,7 @@ static void* refresh_image_filter(void * p_data){
     if(data->editedImage != NULL)
         SDL_FreeSurface(data->editedImage);
 
-    data->editedImage = copy(data->rotateImage);
+    data->editedImage = copy(data->loadImage);
     if(fdata->grayscale)
         data->editedImage = to_grayscale(data->editedImage);
     if(fdata->blur)
@@ -124,7 +132,8 @@ static void* refresh_image_filter(void * p_data){
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 450, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(filterImage, pixbuf);
     free(fdata);
-    pthread_create(&data->thread, NULL, refresh_image_split, NULL);
+    data->inThread = 0;
+    rotate_update();
     return NULL;
 }
 
@@ -140,7 +149,7 @@ static void* refresh_image_rotate(void * p_data){
                                                             "apply_filter"));
     if(data->rotateImage != NULL)
        SDL_FreeSurface(data->rotateImage);
-    data->rotateImage = copy(data->loadImage);
+    data->rotateImage = copy(data->editedImage);
     if(angle >= -180 && angle <= 180)
         data->rotateImage = rotate(data->rotateImage, angle*M_PI/180);
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->rotateImage);
@@ -150,14 +159,21 @@ static void* refresh_image_rotate(void * p_data){
     width = (double)width * ((double)500/height);
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 500, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(rotateImage, pixbuf);
-
-    filter_update();
+    data->inThread = 0;
+    split_update();
     return NULL;
 }
 
 //------------------------------------------------------------------------------
 // EVENTS
 //------------------------------------------------------------------------------
+
+void split_update(){
+    if(data->inThread)
+        pthread_exit(data->thread);
+    data->inThread = 1;
+    pthread_create(&data->thread, NULL, refresh_image_split, NULL);
+}
 
 void filter_update(){
     struct filter_data *fdata = malloc(sizeof(struct filter_data));
@@ -171,8 +187,6 @@ void filter_update(){
     fdata->grayscale = gtk_switch_get_active(grayscaleToggle);
     fdata->blur = gtk_spin_button_get_value(blurSpin);
     fdata->otsu = gtk_spin_button_get_value(ostuSpin);
-
-
 
     if(data->inThread)
         pthread_exit(data->thread);
@@ -219,9 +233,7 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     Data->maxX = Data->loadImage->w;
     Data->maxY = Data->loadImage->h;
 
-    int *angle = malloc(sizeof(int));
-    *angle = -999;
-    pthread_create(&data->thread, NULL, refresh_image_rotate, angle);
+    filter_update();
 
     GtkWidget* confirmButton = GTK_WIDGET(gtk_builder_get_object(Data->builder, 
                                                             "confirmbutton"));

@@ -237,106 +237,6 @@
             <property name="transition-duration">100</property>
             <property name="transition-type">over-left-right</property>
             <child>
-              <object class="GtkFixed" id="stackfixed1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <child>
-                  <object class="GtkFrame" id="frame1">
-                    <property name="width-request">950</property>
-                    <property name="height-request">750</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label-xalign">0</property>
-                    <property name="shadow-type">etched-out</property>
-                    <child>
-                      <object class="GtkAlignment">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="left-padding">12</property>
-                        <child>
-                          <object class="GtkFixed">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <child>
-                              <object class="GtkScale" id="rotation_slider">
-                                <property name="width-request">750</property>
-                                <property name="height-request">20</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="margin-bottom">21</property>
-                                <property name="adjustment">adjustment2</property>
-                                <property name="round-digits">0</property>
-                                <property name="digits">0</property>
-                              </object>
-                              <packing>
-                                <property name="y">650</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkButton" id="auto_rotate_button">
-                                <property name="label" translatable="yes">Auto Rotate</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
-                                <property name="margin-top">13</property>
-                              </object>
-                              <packing>
-                                <property name="x">800</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkAlignment">
-                                <property name="width-request">915</property>
-                                <property name="height-request">600</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <child>
-                                  <object class="GtkImage" id="rotate_image">
-                                    <property name="height-request">300</property>
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">center</property>
-                                    <property name="valign">center</property>
-                                    <property name="stock">gtk-missing-image</property>
-                                  </object>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="y">50</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkButton" id="apply_rotate">
-                                <property name="label" translatable="yes">Apply Rotate</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
-                                <property name="margin-top">13</property>
-                              </object>
-                              <packing>
-                                <property name="x">800</property>
-                                <property name="y">650</property>
-                              </packing>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <child type="label">
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="name">page1</property>
-                <property name="title" translatable="yes">Rotation</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkFixed" id="stackfixed2">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -490,6 +390,35 @@
                                 <property name="y">75</property>
                               </packing>
                             </child>
+                            <child>
+                              <object class="GtkLabel" id="canny">
+                                <property name="width-request">100</property>
+                                <property name="height-request">35</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="label" translatable="yes">Canny</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                  <attribute name="foreground" value="#2626a2a26969"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="y">375</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSwitch" id="canny_switch">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="margin-top">5</property>
+                                <property name="margin-bottom">5</property>
+                                <property name="active">True</property>
+                              </object>
+                              <packing>
+                                <property name="x">150</property>
+                                <property name="y">375</property>
+                              </packing>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -506,6 +435,106 @@
               <packing>
                 <property name="name">page3</property>
                 <property name="title" translatable="yes">Filter</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkFixed" id="stackfixed1">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <object class="GtkFrame" id="frame1">
+                    <property name="width-request">950</property>
+                    <property name="height-request">750</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label-xalign">0</property>
+                    <property name="shadow-type">etched-out</property>
+                    <child>
+                      <object class="GtkAlignment">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="left-padding">12</property>
+                        <child>
+                          <object class="GtkFixed">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <child>
+                              <object class="GtkScale" id="rotation_slider">
+                                <property name="width-request">750</property>
+                                <property name="height-request">20</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="margin-bottom">21</property>
+                                <property name="adjustment">adjustment2</property>
+                                <property name="round-digits">0</property>
+                                <property name="digits">0</property>
+                              </object>
+                              <packing>
+                                <property name="y">650</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="auto_rotate_button">
+                                <property name="label" translatable="yes">Auto Rotate</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">True</property>
+                                <property name="margin-top">13</property>
+                              </object>
+                              <packing>
+                                <property name="x">800</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkAlignment">
+                                <property name="width-request">915</property>
+                                <property name="height-request">600</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkImage" id="rotate_image">
+                                    <property name="height-request">300</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">center</property>
+                                    <property name="valign">center</property>
+                                    <property name="stock">gtk-missing-image</property>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="y">50</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="apply_rotate">
+                                <property name="label" translatable="yes">Apply Rotate</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">True</property>
+                                <property name="margin-top">13</property>
+                              </object>
+                              <packing>
+                                <property name="x">800</property>
+                                <property name="y">650</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="name">page1</property>
+                <property name="title" translatable="yes">Rotation</property>
                 <property name="position">1</property>
               </packing>
             </child>
