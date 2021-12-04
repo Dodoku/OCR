@@ -81,6 +81,8 @@ void otsu_transform(SDL_Surface* image, int decallage){
                 set_pixel(image, i, j, black);
             else
                 set_pixel(image, i, j, white);
+            else
+                set_pixel(image, i, j, black);
         }
     }
 }
