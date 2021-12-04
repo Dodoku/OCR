@@ -9,7 +9,7 @@
 
 #define tmax 180
 
-size_t calc_rhomax(SDL_Surface* image){
+/*size_t calc_rhomax(SDL_Surface* image){
     return (size_t) sqrt(image->w * image->w + image->h * image->h);
 }
 
@@ -88,8 +88,7 @@ void line_trace(SDL_Surface* input, double theta, double rho){
 int get_intersection(size_t rho1, size_t rho2, size_t theta1, size_t theta2){
     double rho_1 = (double) rho1, rho_2 = (double) rho2;
     double theta_1 = (double) theta1, theta_2 = (double) theta2;
-    
-
+    return 0;
 }
 
 void hough_trace(int** A, double x, double y, size_t rhomax){
@@ -167,4 +166,6 @@ double hough_transform(SDL_Surface* input){
     free_matrice(A);
 
     return thetamin;
+    return 0;
 }
+*/

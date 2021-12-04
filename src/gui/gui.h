@@ -33,6 +33,7 @@ struct filter_data {
 
     int blur;
     int otsu;
+    int edgeMap;
 };
 
 void error_message(char *message);

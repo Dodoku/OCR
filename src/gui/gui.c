@@ -17,6 +17,7 @@
 #include "../imageProcess/contrast.h"
 #include "../imageProcess/grayscale.h"
 #include "../imageProcess/noise_reduction.h"
+#include "../imageProcess/canny.h"
 
 #include "../tools/hough.h"
 
@@ -94,7 +95,7 @@ static void* refresh_image_split(){
         SDL_FreeSurface(data->slipImage);
 
     data->slipImage = copy(data->rotateImage);
-    hough_transform(data->slipImage);
+    //hough_transform(data->slipImage);
 
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->slipImage);
     int width = gdk_pixbuf_get_width (pixbuf);
@@ -111,8 +112,8 @@ static void* refresh_image_filter(void * p_data){
     GtkImage* filterImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
                                                             "filter_image"));
 
-    GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
-                                                            "apply_filter"));
+    /*GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "apply_filter"));*/
 
     if(data->editedImage != NULL)
         SDL_FreeSurface(data->editedImage);
@@ -124,6 +125,8 @@ static void* refresh_image_filter(void * p_data){
         data->editedImage = gaussian_blur(data->editedImage, fdata->blur);
     if(fdata->otsu)
         data->editedImage = otsu(data->editedImage, fdata->otsu);
+    if(fdata->edgeMap)
+        data->editedImage = edgemap(data->editedImage);
 
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->editedImage);
     int width = gdk_pixbuf_get_width (pixbuf);
@@ -143,10 +146,6 @@ static void* refresh_image_rotate(void * p_data){
     GtkImage* rotateImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
                                                             "rotate_image"));
 
-    GtkWidget* apply_rotate = GTK_WIDGET(gtk_builder_get_object(data->builder, 
-                                                            "apply_rotate"));
-    GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
-                                                            "apply_filter"));
     if(data->rotateImage != NULL)
        SDL_FreeSurface(data->rotateImage);
     data->rotateImage = copy(data->editedImage);
@@ -170,9 +169,26 @@ static void* refresh_image_rotate(void * p_data){
 
 void split_update(){
     if(data->inThread)
-        pthread_exit(data->thread);
+        pthread_exit(&data->thread);
     data->inThread = 1;
     pthread_create(&data->thread, NULL, refresh_image_split, NULL);
+}
+
+void filter_auto(){
+    GtkSwitch *grayscaleToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
+                                                            "grayscale_switch"));
+    GtkSpinButton *blurSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "nbblur"));
+    GtkSpinButton *ostuSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "nbotsu"));
+    GtkSwitch *edgeMapToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
+                                                            "edgeMap_switch"));
+    gtk_switch_set_active(grayscaleToggle, 1);
+    gtk_spin_button_set_value(blurSpin, 1);
+    gtk_spin_button_set_value(ostuSpin, 1);
+    gtk_switch_set_active(edgeMapToggle, 1);
+
+    filter_update();
 }
 
 void filter_update(){
@@ -183,13 +199,17 @@ void filter_update(){
                                                             "nbblur"));
     GtkSpinButton *ostuSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
                                                             "nbotsu"));
+    GtkSwitch *edgeMapToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
+                                                            "edgeMap_switch"));
+                                                
 
     fdata->grayscale = gtk_switch_get_active(grayscaleToggle);
     fdata->blur = gtk_spin_button_get_value(blurSpin);
     fdata->otsu = gtk_spin_button_get_value(ostuSpin);
+    fdata->edgeMap = gtk_switch_get_active(edgeMapToggle);
 
     if(data->inThread)
-        pthread_exit(data->thread);
+        pthread_exit(&data->thread);
     data->inThread = 1;
     pthread_create(&data->thread, NULL, refresh_image_filter, fdata);
 }
@@ -200,7 +220,7 @@ void rotate_update(){
     *angle = gtk_range_get_value(scale);
 
     if(data->inThread){
-        pthread_exit(data->thread);
+        pthread_exit(&data->thread);
     }
     data->inThread = 1;
     pthread_create(&data->thread, NULL, refresh_image_rotate, angle);
@@ -243,9 +263,40 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     gtk_widget_set_sensitive(stack, TRUE);
 }
 
+void open_fileChooser(){
+    GtkWidget* openFile = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "filename"));
+    gtk_widget_show(openFile);
+}
+
+void open_AboutUs(){
+    GtkWidget* openFile = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "org.dodoku.about"));
+    gtk_widget_show(openFile);
+}
+
+void close_AboutUs(){
+    GtkWidget* openFile = GTK_WIDGET(gtk_builder_get_object(data->builder,
+                                                            "org.dodoku.about"));
+    gtk_widget_hide(openFile);
+}
+
 //------------------------------------------------------------------------------
 // MAIN FUNCTION
 //------------------------------------------------------------------------------
+
+void menu_signals(GtkBuilder* builder){ 
+    g_signal_connect(GTK_MENU_ITEM(gtk_builder_get_object(builder, "train_tools")), 
+                                    "activate", G_CALLBACK(open_train_gui), builder);
+    g_signal_connect(GTK_MENU_ITEM(gtk_builder_get_object(builder, "quit")), 
+                                    "activate", G_CALLBACK(gtk_main_quit), builder);
+
+
+    g_signal_connect(GTK_MENU_ITEM(gtk_builder_get_object(builder, "about-us")), 
+                                    "activate", G_CALLBACK(open_AboutUs), builder);
+    g_signal_connect(GTK_BUTTON(gtk_builder_get_object(builder, "close_about")), 
+                                    "clicked", G_CALLBACK(close_AboutUs), builder);
+}
 
 GtkBuilder *init_gui(){
     // Initializes GTK.
@@ -283,6 +334,8 @@ GtkBuilder *init_gui(){
                                                             "apply_rotate"));
     GtkButton* apply_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "apply_filter"));
+    GtkButton* auto_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
+                                                            "auto_filter"));
     data->mainWindow = mainWindow;
 
     
@@ -296,12 +349,12 @@ GtkBuilder *init_gui(){
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     // Buttons event handlers.
-    g_signal_connect(GTK_MENU_ITEM(gtk_builder_get_object(builder, "train_tools")), 
-                                    "activate", G_CALLBACK(open_train_gui), builder);
     g_signal_connect(chooserButton, "file-set", G_CALLBACK(load_image), data);
     g_signal_connect(apply_rotate, "clicked", G_CALLBACK(rotate_update), data);
     g_signal_connect(apply_filter, "clicked", G_CALLBACK(filter_update), data);
+    g_signal_connect(auto_filter, "clicked", G_CALLBACK(filter_auto), data);
 
+    menu_signals(builder);
 
     // Run the main window.
     gtk_main();
