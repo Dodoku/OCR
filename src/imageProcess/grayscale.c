@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <err.h>
+#include <stdlib.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
 
@@ -94,17 +95,13 @@ SDL_Surface* otsu(SDL_Surface* input, int decallage)
     return output;
 }
 
-SDL_Color get_pixel2(SDL_Surface* image, int x, int y)
+int check(int x, int max)
 {
     if(x<0)
-        x=0;
-    if(x>=image->w)
-        x=image->w-1;
-    if(y<0)
-        y=0;
-    if(y>=image->h)
-        y=image->h-1;
-    return get_pixel(image,x,y);
+        return 0;
+    if(x>=max)
+        return max-1;
+    return x;
 }
 
 SDL_Surface* adaptative_treashold(SDL_Surface* image)
@@ -113,46 +110,45 @@ SDL_Surface* adaptative_treashold(SDL_Surface* image)
     int h=image->h;
     int s=w/8;
     int t=15;
+    long* intImg=calloc(h*w,sizeof(long));
 
-
-    int sum;
     SDL_Surface* out = create_empty(w,h);
-    for(int i=0; i<w;i++)
+
+    int sum=0;
+    for(int i=0;i<w;i++)
     {
-        sum=0;
         for(int j=0;j<h;j++)
         {
             sum+=get_pixel(image,i,j).r;
             if(i==0)
             {
-                set_pixel(image,i,j,to_color(sum,sum,sum,255));
+                intImg[i*h+j]=sum;
             }
             else
             {
-                set_pixel(image,i,j,to_color(get_pixel(image,i-1,j).r+sum,get_pixel(image,i-1,j).g+sum,get_pixel(image,i-1,j).b+sum,255));
+                intImg[i*h+j]=intImg[(i-1)*h+j]+sum;
             }
         }
     }
+
     int x1,x2,y1,y2,count;
-    for(int i=0; i<w;i++)
+    for(int i=0;i<w;i++)
     {
         for(int j=0;j<h;j++)
         {
-            x1=i-s/2;
-            x2=i+s/2;
-            y1=j-s/2;
-            y2=j+s/2;
-            //printf("%d %d %d %d\n",x1,x2,y1,y2 );
+            x1=check(i-s/2,w);
+            x2=check(i+s/2,w);
+            y1=check(j-s/2,h);
+            y2=check(j+s/2,h);
             count=(x2-x1)*(y2-y1);
-            sum=get_pixel2(image,x2,y2).r-get_pixel2(image,x2,y1-1).r-get_pixel2(image,x1-1,y2).r+get_pixel2(image,x1-1,y1-1).r;
-            printf("%d %d \n",get_pixel(image,i,j).r*count,sum*(100-t)/100 );
-            if(get_pixel(image,i,j).r*count <= sum*(100-t)/100)
+            sum=intImg[check(x2,w)*h+check(y2,h)]-intImg[check(x2,w)*h+check(y1-1,h)]-intImg[check(x1-1,w)*h+check(y2,h)]+intImg[check(x1-1,w)*h+check(y1-1,h)];
+            if(get_pixel(image,i,j).r*count <= (sum*(100-t)/100))
             {
-                set_pixel(out,i,j,to_color(0,0,0,255));
+                set_pixel(out,i,j,to_color(255,255,255,255));
             }
             else
             {
-                set_pixel(out,i,j,to_color(255,255,255,255));
+                set_pixel(out,i,j,to_color(0,0,0,255));
             }
         }
     }
