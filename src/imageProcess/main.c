@@ -13,12 +13,12 @@
 
 int main(int argc, char *argv[])
  {
-    SDL_Surface* image = load("tests/assets/image_05.jpeg");
+    SDL_Surface* image = load("tests/assets/image_02.jpeg");
 
 
     //image = gaussian_blur(image, 5);
     image = to_grayscale(image);
-    save(image, "generated12.jpeg");
+    image = to_grayscale(image);
     image = adaptative_treashold(image);
     save(image, "generated1.jpeg");
     printf("blur -> picture saved\n");

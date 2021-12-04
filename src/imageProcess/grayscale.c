@@ -92,17 +92,13 @@ SDL_Surface* otsu(SDL_Surface* input, int decallage)
     return output;
 }
 
-SDL_Color get_pixel2(SDL_Surface* image, int x, int y)
+int check(int x, int max)
 {
     if(x<0)
-        x=0;
-    if(x>=image->w)
-        x=image->w-1;
-    if(y<0)
-        y=0;
-    if(y>=image->h)
-        y=image->h-1;
-    return get_pixel(image,x,y);
+        return 0;
+    if(x>=max)
+        return max-1;
+    return x;
 }
 
 SDL_Surface* adaptative_treashold(SDL_Surface* image)
@@ -111,32 +107,47 @@ SDL_Surface* adaptative_treashold(SDL_Surface* image)
     int h=image->h;
     int s=w/8;
     int t=15;
-    int intImg[w][h];
+    long intImg[w*h];
+
+    SDL_Surface* out = create_empty(w,h);
 
     int sum=0;
     for(int i=0;i<w;i++)
     {
         for(int j=0;j<h;j++)
         {
-            sum+=get_pixel(image,i,j);
+            sum+=get_pixel(image,i,j).r;
             if(i==0)
             {
-                intImg[i][j]=sum;
+                intImg[i*w+j]=sum;
             }
             else
             {
-                intImg[i][j]=intImg[i-1][j]+sum;
+                intImg[i*w+j]=intImg[(i-1)*w+j]+sum;
             }
         }
     }
 
-    int x1,x2,y1,y2;
+    int x1,x2,y1,y2,count;
     for(int i=0;i<w;i++)
     {
         for(int j=0;j<h;j++)
         {
-            x1
+            x1=check(i-s/2,w);
+            x2=check(i+s/2,w);
+            y1=check(j-s/2,h);
+            y2=check(j+s/2,h);
+            count=(x2-x1)*(y2-y1);
+            sum=intImg[check(x2,w)*w+check(y2,h)]-intImg[check(x2,w)*w+check(y1-1,h)]-intImg[check(x1-1,w)*w+check(y2,h)]+intImg[check(x1-1,w)*w+check(y1-1,h)];
+            if(get_pixel(image,i,j).r*count <= (sum*(100-t)/100))
+            {
+                set_pixel(out,i,j,to_color(255,255,255,255));
+            }
+            else
+            {
+                set_pixel(out,i,j,to_color(0,0,0,255));
+            }
         }
     }
-
+    return out;
 }
