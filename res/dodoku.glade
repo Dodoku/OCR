@@ -19,6 +19,26 @@
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
+  <object class="GtkAdjustment" id="adjustment_bottom">
+    <property name="upper">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment_left">
+    <property name="upper">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment_right">
+    <property name="upper">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment_top">
+    <property name="upper">10</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
   <object class="GtkFileFilter" id="dataFilter">
     <patterns>
       <pattern>*.data</pattern>
@@ -470,15 +490,15 @@
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <child>
-                              <object class="GtkButton" id="auto_splitting_button">
-                                <property name="label" translatable="yes">Auto Split</property>
+                              <object class="GtkButton" id="confirm_splitting_button">
+                                <property name="label" translatable="yes">Confirm Split</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
                                 <property name="margin-top">13</property>
                               </object>
                               <packing>
-                                <property name="x">825</property>
+                                <property name="x">785</property>
                               </packing>
                             </child>
                             <child>
@@ -499,6 +519,9 @@
                                   </object>
                                 </child>
                               </object>
+                              <packing>
+                                <property name="x">45</property>
+                              </packing>
                             </child>
                             <child>
                               <object class="GtkDrawingArea" id="draw_border_split">
@@ -510,6 +533,49 @@
                               <packing>
                                 <property name="x">-134</property>
                                 <property name="y">27</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="top_splitting">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="adjustment">adjustment_top</property>
+                              </object>
+                              <packing>
+                                <property name="x">350</property>
+                                <property name="y">10</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="right_spitting">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="adjustment">adjustment_right</property>
+                              </object>
+                              <packing>
+                                <property name="x">775</property>
+                                <property name="y">300</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="bottom_splitting">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="adjustment">adjustment_bottom</property>
+                              </object>
+                              <packing>
+                                <property name="x">350</property>
+                                <property name="y">670</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="left_splitting">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="adjustment">adjustment_left</property>
+                              </object>
+                              <packing>
+                                <property name="y">300</property>
                               </packing>
                             </child>
                           </object>

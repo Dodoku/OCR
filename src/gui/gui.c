@@ -18,8 +18,17 @@
 #include "../imageProcess/grayscale.h"
 #include "../imageProcess/noise_reduction.h"
 #include "../imageProcess/canny.h"
+#include "../imageSpliter/spliter.h"
 
 #include "../tools/hough.h"
+
+#include "../neuralNetwork/neuralNetwork.h"
+#include "../neuralNetwork/dataLoader.h"
+#include "../neuralNetwork/number.h"
+
+#include "../solver/solver.h"
+
+#include "../imageGenerator/digit_picture.h"
 
 void error_message(char *message)
 {
@@ -80,6 +89,79 @@ struct gui_data *data;
 // THREADS
 //------------------------------------------------------------------------------
 
+static void *refresh_image_solver(){
+    GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "image2"));
+
+    int grid[81];
+    init_grid_with_string(data->output, grid);
+    solve(grid);
+
+    char solved[82];
+    save_grid_in_string(solved, grid);
+
+    if(data->generatedImage != NULL)
+        SDL_FreeSurface(data->generatedImage);
+
+    data->generatedImage = generate_digit_picture(data->output, solved);
+
+    GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->generatedImage);
+    int width = gdk_pixbuf_get_width (pixbuf);
+    int height = gdk_pixbuf_get_height (pixbuf);
+    width = (double)width * ((double)600/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 600, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(image, pixbuf);
+
+    data->inThread = 0;
+    return NULL;
+}
+
+static void *refresh_image_network(){
+   /* GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "network_image"));
+
+    GtkWidget* widget = GTK_WIDGET((gtk_builder_get_object(data->builder, "network_data_file")));
+
+    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget));
+    int *x1List = malloc(81 * sizeof(int));
+    int *x2List = malloc(81 * sizeof(int));
+    int *y1List = malloc(81 * sizeof(int));
+    int *y2List = malloc(81 * sizeof(int));
+    data->networkSurface = rotate(data->withoutEdgeMap, (double)data->angle*M_PI/180);
+    little_square(data->x1, data->y1, data->x2, data->y2, x1List, x2List, y1List, y2List);
+    struct pic_pos* pos = to_network(data->networkSurface, x1List, x2List, y1List, y2List);
+
+    save(data->networkSurface, "grid.png");
+    char *s = malloc(sizeof(char)*83);
+    Network net = load_network(filename);
+    printf("%i\n", net.nbHiddens);
+    printf("%i\n", net.input.nbNeurons);
+    for(int i = 0; i < 81; i++){
+        char name[10];
+        name[0] = i + '0';
+        name[1] = '\0';
+        strcat(name, ".png");
+        save(pos[i].image, name);
+        s[i] = eval_number(&net, pos[i].image) + '0';
+        if(s[i] == '0'){
+            s[i] = '.';
+        }
+        SDL_FreeSurface(pos[i].image);
+    }
+    s[81] = '\0'; 
+    printf("%s\n", s);
+    free_network(&net);
+    data->output = s;*/
+    
+    
+    /*GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->withoutEdgeMap);
+    int width = gdk_pixbuf_get_width (pixbuf);
+    int height = gdk_pixbuf_get_height (pixbuf);
+    width = (double)width * ((double)400/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 400, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(image, pixbuf);*/
+    data->inThread = 0;
+    return NULL;
+}
+
 static void* refresh_image_split(){
     GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "splitting_image"));
 
@@ -95,13 +177,61 @@ static void* refresh_image_split(){
         SDL_FreeSurface(data->slipImage);
 
     data->slipImage = copy(data->rotateImage);
-    //hough_transform(data->slipImage);
+
+    GtkSpinButton *top = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "top_splitting"));
+    GtkSpinButton *left = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "left_splitting"));
+    GtkSpinButton *botton = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "bottom_splitting"));
+    GtkSpinButton *right = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                            "right_spitting"));
+
+    int top_value = gtk_spin_button_get_value(top);
+    int left_value = gtk_spin_button_get_value(left);
+    int botton_value = gtk_spin_button_get_value(botton);
+    int right_value = gtk_spin_button_get_value(right);
+
+    unsigned int* thor = calloc(0, sizeof(unsigned int));
+    unsigned int* tver = calloc(0, sizeof(unsigned int));
+    
+    int* rhor = calloc(0, sizeof(int));
+    int* rver = calloc(0, sizeof(int));
+
+    size_t lhor = 0;
+    size_t lver = 0;
+
+    hough_transform(data->slipImage, &thor, &tver, &rhor, &rver, &lhor, &lver);
+
+    line_trace(data->slipImage, ttt(thor[left_value]), rhor[left_value]);
+    line_trace(data->slipImage, ttt(thor[lhor-1-right_value]), rhor[lhor-1-right_value]);
+    line_trace(data->slipImage, ttt(tver[top_value]), rver[top_value]);
+    line_trace(data->slipImage, ttt(tver[lver-1-botton_value]), rver[lver-1-botton_value]);
+
+    size_t x1, y1, x2, y2;
+
+    get_intersection(rver[top_value], rhor[left_value], tver[top_value], thor[left_value], 
+                                                &x1, &y1, data->slipImage->w, data->slipImage->h);
+
+    get_intersection(rver[lver-1-botton_value], rhor[lhor-1-right_value], tver[lver-1-botton_value], rhor[lhor-1-right_value], 
+                                                &x2, &y2, data->slipImage->w, data->slipImage->h);
+
+    data->x1 = x1;
+    data->y1 = y1;
+    data->x2 = x2;
+    data->y2 = y2;
+
+    printf("%zu %zu %zu %zu\n", x1, y1, x2, y2);
+    free(thor);
+    free(tver);
+    free(rhor);
+    free(rver);
 
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->slipImage);
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
-    width = (double)width * ((double)500/height);
-    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 500, GDK_INTERP_BILINEAR);
+    width = (double)width * ((double)400/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 400, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(image, pixbuf);
     data->inThread = 0;
     return NULL;
@@ -111,9 +241,6 @@ static void* refresh_image_filter(void * p_data){
     struct filter_data *fdata = (struct filter_data*)p_data;
     GtkImage* filterImage = GTK_IMAGE(gtk_builder_get_object(data->builder, 
                                                             "filter_image"));
-
-    /*GtkWidget* apply_filter = GTK_WIDGET(gtk_builder_get_object(data->builder, 
-                                                            "apply_filter"));*/
 
     if(data->editedImage != NULL)
         SDL_FreeSurface(data->editedImage);
@@ -125,12 +252,13 @@ static void* refresh_image_filter(void * p_data){
         data->editedImage = simple_blur(data->editedImage, fdata->blur);
     if(fdata->otsu)
         data->editedImage = otsu(data->editedImage, fdata->otsu);
+    data->withoutEdgeMap = copy(data->editedImage);
     if(fdata->edgeMap)
         data->editedImage = edgemap(data->editedImage);
 
     if(fdata->isAuto && !test_proportions(data->editedImage) && fdata->otsu < 50){
         fdata->blur += 1;
-        fdata->otsu += 10;
+        fdata->otsu += 15;
         GtkSpinButton *blurSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
                                                         "nbblur"));
         GtkSpinButton *ostuSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
@@ -160,11 +288,12 @@ static void* refresh_image_rotate(void * p_data){
 
     if(data->rotateImage != NULL)
        SDL_FreeSurface(data->rotateImage);
+
     data->rotateImage = copy(data->editedImage);
     if(angle >= -180 && angle <= 180)
         data->rotateImage = rotate(data->rotateImage, angle*M_PI/180);
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->rotateImage);
-
+    data->angle = angle;
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
     width = (double)width * ((double)500/height);
@@ -175,9 +304,33 @@ static void* refresh_image_rotate(void * p_data){
     return NULL;
 }
 
+gboolean loopRefreshSensitive(){
+    GtkWidget* confirmButton = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "confirmbutton"));
+    GtkWidget* stack = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "stack1"));
+    gtk_widget_set_sensitive(confirmButton, !data->inThread);
+    gtk_widget_set_sensitive(stack, !data->inThread);
+    return TRUE;
+}
+
 //------------------------------------------------------------------------------
 // EVENTS
 //------------------------------------------------------------------------------
+
+void apply_solved(){
+    if(data->inThread)
+        pthread_exit(&data->thread);
+    data->inThread = 1;
+    pthread_create(&data->thread, NULL, refresh_image_solver, NULL);
+}
+
+void apply_network(){
+    if(data->inThread)
+        pthread_exit(&data->thread);
+    data->inThread = 1;
+    pthread_create(&data->thread, NULL, refresh_image_network, NULL);
+}
 
 void split_update(){
     if(data->inThread)
@@ -197,12 +350,12 @@ void filter_auto(){
     GtkSwitch *edgeMapToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
                                                             "edgeMap_switch"));
     gtk_switch_set_active(grayscaleToggle, 1);
-    gtk_spin_button_set_value(blurSpin, 1);
+    gtk_spin_button_set_value(blurSpin, 0);
     gtk_spin_button_set_value(ostuSpin, 1);
     gtk_switch_set_active(edgeMapToggle, 1);
     
     fdata->grayscale = 1;
-    fdata->blur = 1;
+    fdata->blur = 0;
     fdata->otsu = 1;
     fdata->edgeMap = 1;
     fdata->isAuto = 1;
@@ -238,7 +391,22 @@ void filter_update(){
 }
 
 void rotate_auto(){
-    double angle = hough_transform(data->editedImage);
+    unsigned int* thor = calloc(0, sizeof(unsigned int));
+    unsigned int* tver = calloc(0, sizeof(unsigned int));
+    
+    int* rhor = calloc(0, sizeof(int));
+    int* rver = calloc(0, sizeof(int));
+
+    size_t lhor = 0;
+    size_t lver = 0;
+
+    double angle = hough_transform(data->rotateImage, &thor, &tver, &rhor, &rver, &lhor, &lver);
+
+    free(thor);
+    free(tver);
+    free(rhor);
+    free(rver);
+    
     printf("%f\n", angle);
     GtkRange *scale = GTK_RANGE(gtk_builder_get_object(data->builder, "rotation_slider"));
     gtk_range_set_value(scale, -angle*180/M_PI);
@@ -277,21 +445,15 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     Data->editedImage = copy(Data->loadImage);
     Data->rotateImage = copy(Data->loadImage);
     Data->slipImage = copy(Data->loadImage);
-    
-    Data->minX = 0;
-    Data->minY = 0;
+    Data->withoutEdgeMap = copy(Data->loadImage);
 
-    Data->maxX = Data->loadImage->w;
-    Data->maxY = Data->loadImage->h;
+    Data->x1 = 0;
+    Data->y1 = 0;
+
+    Data->x2 = Data->loadImage->w;
+    Data->y2 = Data->loadImage->h;
 
     filter_update();
-
-    GtkWidget* confirmButton = GTK_WIDGET(gtk_builder_get_object(Data->builder, 
-                                                            "confirmbutton"));
-    GtkWidget* stack = GTK_WIDGET(gtk_builder_get_object(Data->builder, 
-                                                            "stack1"));
-    gtk_widget_set_sensitive(confirmButton, TRUE);
-    gtk_widget_set_sensitive(stack, TRUE);
 }
 
 void open_fileChooser(){
@@ -365,12 +527,19 @@ GtkBuilder *init_gui(){
                                                             "apply_rotate"));
     GtkButton* auto_rotate = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "auto_rotate_button"));
+    GtkButton* apply_splitting = GTK_BUTTON(gtk_builder_get_object(builder, 
+                                                            "confirm_splitting_button"));
     GtkButton* apply_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "apply_filter"));
     GtkButton* auto_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "auto_filter"));
+    GtkButton* network_apply = GTK_BUTTON(gtk_builder_get_object(builder, 
+                                                            "apply_network"));
+    GtkButton* resolve = GTK_BUTTON(gtk_builder_get_object(builder, 
+                                                            "confirmbutton"));
     data->mainWindow = mainWindow;
 
+    g_timeout_add(100, (GSourceFunc)loopRefreshSensitive, data);
     
     char cwd[PATH_MAX];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
@@ -387,6 +556,9 @@ GtkBuilder *init_gui(){
     g_signal_connect(apply_filter, "clicked", G_CALLBACK(filter_update), data);
     g_signal_connect(auto_filter, "clicked", G_CALLBACK(filter_auto), data);
     g_signal_connect(auto_rotate, "clicked", G_CALLBACK(rotate_auto), data);
+    g_signal_connect(apply_splitting, "clicked", G_CALLBACK(split_update), data);
+    g_signal_connect(network_apply, "clicked", G_CALLBACK(apply_network), data);
+    g_signal_connect(resolve, "clicked", G_CALLBACK(apply_solved), data);
 
     menu_signals(builder);
 

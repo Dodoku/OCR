@@ -157,7 +157,7 @@ int eval_number(Network *net, SDL_Surface *image){
     for(int k = 0; k < 10; k++){
         if(net->output.neurons[k].value > net->output.neurons[max].value)
             max = k;
-        //printf("%i: %f\n", k, net->output.neurons[k].value);
+        printf("%i: %f\n", k, net->output.neurons[k].value);
     }
     //printf("\n");
     return max;

@@ -12,12 +12,13 @@ struct gui_data {
     SDL_Surface *editedImage;
     SDL_Surface *rotateImage;
     SDL_Surface *slipImage;
+    SDL_Surface *withoutEdgeMap;
+    SDL_Surface *networkSurface;
+    SDL_Surface *generatedImage;
 
-    int minX;
-    int minY;
-
-    int maxX;
-    int maxY;
+    int angle;
+    int x1, y1, x2, y2;
+    char *output;
 
     GtkButton *pressed;
     guint event;
