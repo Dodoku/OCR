@@ -23,7 +23,7 @@ int max(int** A, size_t rhomax);
 
 void line_trace(SDL_Surface* input, double theta, double rho);
 
-int get_intersection(size_t rho1, size_t rho2, size_t theta1, size_t theta2,
+int get_intersection(int rho1, int rho2, size_t theta1, size_t theta2,
                             size_t *i, size_t *j, size_t width, size_t height);
 
 void trace_intersection(SDL_Surface* input, size_t x, size_t y);
