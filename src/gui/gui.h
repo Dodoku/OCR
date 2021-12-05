@@ -12,6 +12,7 @@ struct gui_data {
     SDL_Surface *editedImage;
     SDL_Surface *rotateImage;
     SDL_Surface *slipImage;
+    SDL_Surface *withoutEdgeMap;
 
     int minX;
     int minY;

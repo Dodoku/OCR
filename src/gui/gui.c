@@ -125,12 +125,13 @@ static void* refresh_image_filter(void * p_data){
         data->editedImage = simple_blur(data->editedImage, fdata->blur);
     if(fdata->otsu)
         data->editedImage = otsu(data->editedImage, fdata->otsu);
+    data->withoutEdgeMap = copy(data->editedImage);
     if(fdata->edgeMap)
         data->editedImage = edgemap(data->editedImage);
 
     if(fdata->isAuto && !test_proportions(data->editedImage) && fdata->otsu < 50){
         fdata->blur += 1;
-        fdata->otsu += 10;
+        fdata->otsu += 15;
         GtkSpinButton *blurSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
                                                         "nbblur"));
         GtkSpinButton *ostuSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
@@ -171,8 +172,18 @@ static void* refresh_image_rotate(void * p_data){
     pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 500, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(rotateImage, pixbuf);
     data->inThread = 0;
-    split_update();
     return NULL;
+}
+
+gboolean loopRefreshSensitive(){
+    GtkWidget* confirmButton = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "confirmbutton"));
+    GtkWidget* stack = GTK_WIDGET(gtk_builder_get_object(data->builder, 
+                                                            "stack1"));
+    gtk_widget_set_sensitive(confirmButton, !data->inThread);
+    gtk_widget_set_sensitive(stack, !data->inThread);
+    printf("%d\n", data->inThread);
+    return TRUE;
 }
 
 //------------------------------------------------------------------------------
@@ -197,12 +208,12 @@ void filter_auto(){
     GtkSwitch *edgeMapToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
                                                             "edgeMap_switch"));
     gtk_switch_set_active(grayscaleToggle, 1);
-    gtk_spin_button_set_value(blurSpin, 1);
+    gtk_spin_button_set_value(blurSpin, 0);
     gtk_spin_button_set_value(ostuSpin, 1);
     gtk_switch_set_active(edgeMapToggle, 1);
     
     fdata->grayscale = 1;
-    fdata->blur = 1;
+    fdata->blur = 0;
     fdata->otsu = 1;
     fdata->edgeMap = 1;
     fdata->isAuto = 1;
@@ -277,7 +288,8 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     Data->editedImage = copy(Data->loadImage);
     Data->rotateImage = copy(Data->loadImage);
     Data->slipImage = copy(Data->loadImage);
-    
+    Data->withoutEdgeMap = copy(Data->loadImage);
+
     Data->minX = 0;
     Data->minY = 0;
 
@@ -285,13 +297,6 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     Data->maxY = Data->loadImage->h;
 
     filter_update();
-
-    GtkWidget* confirmButton = GTK_WIDGET(gtk_builder_get_object(Data->builder, 
-                                                            "confirmbutton"));
-    GtkWidget* stack = GTK_WIDGET(gtk_builder_get_object(Data->builder, 
-                                                            "stack1"));
-    gtk_widget_set_sensitive(confirmButton, TRUE);
-    gtk_widget_set_sensitive(stack, TRUE);
 }
 
 void open_fileChooser(){
@@ -371,6 +376,7 @@ GtkBuilder *init_gui(){
                                                             "auto_filter"));
     data->mainWindow = mainWindow;
 
+    g_timeout_add(100, (GSourceFunc)loopRefreshSensitive, data);
     
     char cwd[PATH_MAX];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {

@@ -66,13 +66,13 @@ int otsu_threshold(int* A, int N){
 
 int test_proportions(SDL_Surface* image){
     int sum = 0;
-    for(int i = 0; i < image->w/10; i++){
-        for(int j = 0; j < image->h/10; j++){
+    for(int i = 0; i < image->w; i += 1){
+        for(int j = 0; j < image->h; j += 1){
             if(get_pixel(image, i, j).r >= 255/2)
                 sum++;
         }
     }
-    return (double) sum / (image->w/100 * image->h/100) < 0.05;
+    return (double) sum / (image->w * image->h) < 0.05;
 }
 
 void otsu_transform(SDL_Surface* image, int decallage){
@@ -89,7 +89,7 @@ void otsu_transform(SDL_Surface* image, int decallage){
     int threshold = otsu_threshold(A, height*width);
     for(size_t i = 0; i < width; i++){
         for(size_t j = 0; j < height; j++){
-            if(get_pixel(image, i, j).r > threshold - decallage*2)
+            if(get_pixel(image, i, j).r > threshold - decallage*3)
                 set_pixel(image, i, j, black);
             else
                 set_pixel(image, i, j, white);
