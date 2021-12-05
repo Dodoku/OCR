@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include "../tools/image.h"
+#include "../tools/hough.h"
 
 #define tmax 180
 #define margin 50
@@ -21,6 +22,10 @@ int get_value(int **A, size_t rhomax, unsigned int theta, int rho){
 void set_value(int **A, size_t rhomax, unsigned int theta, int rho,
                                                                 int value){
     A[theta][(size_t) (rho+rhomax)] = value;
+}
+
+double ttt(unsigned int theta){
+    return ((double) theta)*(M_PI/180);
 }
 
 int** init_matrice(size_t rhomax){
@@ -65,25 +70,73 @@ void line_trace(SDL_Surface* input, double theta, double rho){
     for (x = 0; x < width; x++){
         y = rho - x*cos(theta);
         y /= sin(theta); //y*sin(theta) = rho - x*cos(theta)
-        if (x>0 && y>0){ 
-                i = (size_t) x;
-                j = (size_t) y;
-                if (i < width && j < height){
-                        set_pixel(input, i, j, to_color(0,0,255,255));
-                }
+        if (x>=0 && y>=0){ 
+            i = (size_t) x;
+            j = (size_t) y;
+            if (i < width && j < height){
+                set_pixel(input, i, j, to_color(0,0,255,255));
+            }
         }
     }
     for (y = 0; y < height; y++){
         x = rho - y*sin(theta);
         x /= cos(theta); //x*cos(theta) = rho - y*sin(theta)
         if (x>0 && y>0){
-                i = (size_t) x;
-                j = (size_t) y;
-                if (i < width && j < height){
-                        set_pixel(input, i, j, to_color(0,255,0,255));
-                }
+            i = (size_t) x;
+            j = (size_t) y;
+            if (i < width && j < height){
+                set_pixel(input, i, j, to_color(0,255,0,255));
+            }
         }
     }
+}
+
+void line_trace_v(SDL_Surface* input, double theta, double rho, SDL_Color color){
+    size_t height = input->h, width = input->w;
+    double x, y;
+    size_t i, j;
+    for (x = 0; x < width; x++){
+        y = rho - x*cos(theta);
+        y /= sin(theta); //y*sin(theta) = rho - x*cos(theta)
+        if (x>0 && y>0){ 
+            i = (size_t) x;
+            j = (size_t) y;
+            if (i < width && j < height){
+                set_pixel(input, i, j, color);
+            }
+        }
+    }
+}
+
+void line_trace_h(SDL_Surface* input, double theta, double rho, SDL_Color color){
+    size_t height = input->h, width = input->w;
+    double x, y;
+    size_t i, j;
+    for (y = 0; y < height; y++){
+        x = rho - y*sin(theta);
+        x /= cos(theta); //x*cos(theta) = rho - y*sin(theta)
+        if (x>0 && y>0){
+            i = (size_t) x;
+            j = (size_t) y;
+            if (i < width && j < height){
+                set_pixel(input, i, j, color);
+            }
+        }
+    }
+}
+
+// when the line is vertical, because we want x = 0 and get the height of the line
+double height_line(int r, unsigned int t){
+    double rho = (double) r;
+    double theta = ttt(t);
+    return rho/sin(theta);
+}
+
+// when the line is horizontal, because we want y = 0 and get the 
+double side_line(int r, unsigned int t){
+    double rho = (double) r;
+    double theta = ttt(t);
+    return rho/cos(theta);
 }
 
 int get_intersection(size_t rho1, size_t rho2, size_t theta1, size_t theta2,
@@ -123,6 +176,7 @@ int get_intersection(size_t rho1, size_t rho2, size_t theta1, size_t theta2,
     return (*i < width && *j < height);
 }
 
+
 void trace_intersection(SDL_Surface* input, size_t x, size_t y){
     size_t width = input->w, height = input->h;
     size_t xmax = x + 2, xmin = x - 2;
@@ -140,7 +194,7 @@ void trace_intersection(SDL_Surface* input, size_t x, size_t y){
 
     for (size_t i = xmin; i <= xmax; i++)
         for (size_t j = ymin; j <= ymax; j++)
-            set_pixel(input, i, j, to_color(255, 0, 0, 255));
+            set_pixel(input, i, j, to_color(255, 127, 127, 255));
 }
 
 void hough_trace(int** A, double x, double y, size_t rhomax){
@@ -176,20 +230,20 @@ int** init_hough(SDL_Surface* input){
 void mergeline(int** rholist, unsigned int** thetalist, size_t* length,
                                         unsigned int theta, int rho){
     for (size_t i = 0; i < (*length); i++)
-        if (abs_diff((*rholist)[i], rho) < margin && abs_diff((*thetalist)[i], theta) < margin)
+        if (abs_diff((*rholist)[i], rho) < margin &&
+            abs_diff((*thetalist)[i], theta) < margin)
             return;
     (*length)++;
     *thetalist = realloc(*thetalist, (*length) * sizeof(unsigned int));
     *rholist = realloc(*rholist, (*length) * sizeof(int));
-    //printf("length = %zu\n", *length);
     (*thetalist)[(*length)-1] = theta;
     (*rholist)[(*length)-1] = rho;
 }
 
 size_t get_line(int** A, int** rholist, unsigned int** thetalist,
-                            size_t thetastart, int rhomax, int threshold){
+                                         int rhomax, int threshold){
     size_t length = 0;
-    for (unsigned int t = thetastart; t < tmax/2 + thetastart; t++)
+    for (unsigned int t = 0; t < tmax; t++)
         for (int r = -rhomax; r < (int) rhomax; r++)
             if (get_value(A,rhomax, t, r) > threshold)
                 mergeline(rholist, thetalist, &length, t, r);
@@ -202,76 +256,153 @@ double findangle(unsigned int* thetalist, size_t length){
     return 0;
 }
 
+void get_rect(SDL_Surface* input, unsigned int** thetalist_inf, unsigned int** thetalist_sup, int** rholist_inf, int** rholist_sup, size_t length_inf, size_t length_sup){
+    struct tuple up;
+    up.theta = (*thetalist_inf)[0];
+    up.rho = (*rholist_inf)[0];
+    struct tuple down;
+    down.theta = (*thetalist_inf)[length_inf-1];
+    down.rho = (*rholist_inf)[length_inf-1];
+    struct tuple left;
+    left.theta = (*thetalist_sup)[0];
+    left.rho = (*rholist_sup)[0];
+    struct tuple right;
+
+    right.theta = (*thetalist_sup)[length_sup-1];
+    right.rho = (*rholist_sup)[length_sup-1];
+
+    line_trace_h(input, ttt(up.theta), (double) up.rho, to_color(255,0,0,255));
+    line_trace_h(input, ttt(down.theta), (double) down.rho, to_color(0,255,0,255));
+    line_trace_v(input, ttt(left.theta), (double) left.rho, to_color(0,0,255,255));
+    line_trace_v(input, ttt(right.theta), (double) right.rho, to_color(255,0,255,255));
+}
+
+void swap(int* a, int* b, unsigned int* i, unsigned int* j){
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+
+    unsigned int eff = *i;
+    *i = *j;
+    *j = eff;
+}
+
+int partition0(int** R, unsigned int** T, int l, int h){
+    double x = side_line((*R)[h], (*T)[h]);
+    int i = (l - 1);
+ 
+    for (int j = l; j <= h - 1; j++) { 
+        if (side_line((*R)[j], (*T)[j]) <= x) {
+            i++;
+            swap(&(*R)[i], &(*R)[j], &(*T)[i], &(*T)[j]);
+        }
+    }
+    swap(&(*R)[i + 1], &(*R)[h], &(*T)[i + 1], &(*T)[h]);
+    return (i + 1);
+}
+
+void quickSort0(int** R, unsigned int** T,  int l, int h){
+    if (l < h) {
+        int p = partition0(R, T, l, h);
+        quickSort0(R, T, l, p - 1);
+        quickSort0(R, T, p + 1, h);
+    }
+}
+
+int partition90(int** R, unsigned int** T, int l, int h){
+    double x = height_line((*R)[h], (*T)[h]);
+    size_t i = (l - 1);
+ 
+    for (int j = l; j <= h - 1; j++) {
+        if (height_line((*R)[j], (*T)[j]) <= x) {
+            i++;
+            swap(&(*R)[i], &(*R)[j], &(*T)[i], &(*T)[j]);
+        }
+    }
+    swap(&(*R)[i + 1], &(*R)[h], &(*T)[i + 1], &(*T)[h]);
+    return (i + 1);
+}
+
+void quickSort90(int** R, unsigned int** T,  int l, int h){
+    if (l < h) {
+        int p = partition90(R, T, l, h);
+        quickSort90(R, T, l, p - 1);
+        quickSort90(R, T, p + 1, h);
+    }
+}
+
 double hough_transform(SDL_Surface* input){
+    size_t width = input->w, height = input->h;
     size_t rhomax = calc_rhomax(input);
     int** A;
-    // 1st step - Get hough 
+    // 1st step - Get hough
     A = init_hough(input);
     // 2nd step - Find hough threshold
     int threshold = 1*max(A, rhomax)/4;
     // 3rd step - Find all the interesting function
-    // var_inf -> with 0 <= theta < 90
-    unsigned int* thetalist_inf = calloc(0, sizeof(double));
-    int* rholist_inf = calloc(0, sizeof(double));
-    size_t length_inf = get_line(A, &rholist_inf, &thetalist_inf, 0, rhomax, threshold);
+    unsigned int* thetalist = calloc(0, sizeof(unsigned int));
+    int* rholist = calloc(0, sizeof(int));
+    size_t length = get_line(A, &rholist, &thetalist, rhomax, threshold);
+    // find the angle the picture is lead into
+    double thetamin = findangle(thetalist,length);
+    
+    unsigned int* thetalist_inf = calloc(0, sizeof(unsigned int));
+    int* rholist_inf = calloc(0, sizeof(int));
+    size_t length_inf = 0;
+    unsigned int* thetalist_sup = calloc(0, sizeof(unsigned int));
+    int* rholist_sup = calloc(0, sizeof(int));
+    size_t length_sup = 0;
 
-    // var_sup -> with 90 <= theta < 180
-    unsigned int* thetalist_sup = calloc(0, sizeof(double));
-    int* rholist_sup = calloc(0, sizeof(double));
-    size_t length_sup = get_line(A, &rholist_sup, &thetalist_sup, 90, rhomax, threshold);
+
+    for (size_t i = 0; i < length; i++){
+        if (thetalist[i]-thetalist[0] < 80 || thetalist[i]-thetalist[0] >= 170){
+            length_inf++;
+            thetalist_inf = realloc(thetalist_inf, length_inf * sizeof(unsigned int));
+            rholist_inf = realloc(rholist_inf, length_inf * sizeof(int));
+            thetalist_inf[length_inf-1] = thetalist[i];
+            rholist_inf[length_inf-1] = rholist[i];
+        }
+        else{
+            length_sup++;
+            thetalist_sup = realloc(thetalist_sup, length_sup * sizeof(unsigned int));
+            rholist_sup = realloc(rholist_sup, length_sup * sizeof(int));
+            thetalist_sup[length_sup-1] = thetalist[i];
+            rholist_sup[length_sup-1] = rholist[i];
+        }
+    }
+    
+    quickSort0(&rholist_inf, &thetalist_inf, 0, length_inf-1);
+    quickSort90(&rholist_sup, &thetalist_sup, 0, length_sup-1);
+
+    //line_trace_h(input, ttt(thetalist_inf[0]), (double) rholist_inf[0]);
+    //line_trace_h(input, ttt(thetalist_inf[length_inf-1]), (double) rholist_inf[length_inf-1]);
+    //line_trace_v(input, ttt(thetalist_sup[0]), (double) rholist_sup[0]);
+    //line_trace_v(input, ttt(thetalist_sup[length_sup-1]), (double) rholist_sup[length_sup-1]);
+    
 
     for (size_t i = 0; i < length_inf; i++){
-        printf("i = %zu\n", i);
-        double theta = ((double) thetalist_inf[i])*(M_PI/180);
-        double rho = (double) rholist_inf[i];
-        line_trace(input, theta, rho);
+        double temp = side_line(rholist_inf[i], thetalist_inf[i]);
+        printf("side diff = %f\n", temp);
+        if (temp < height && temp >= 0)
+            trace_intersection(input, temp, 0);
     }
 
     for (size_t i = 0; i < length_sup; i++){
-        double theta = ((double) thetalist_sup[i])*(M_PI/180);
-        double rho = (double) rholist_sup[i];
-        line_trace(input, theta, rho);
+        double temp = height_line(rholist_sup[i], thetalist_sup[i]);
+        printf("height diff = %f\n", temp);
+        if (temp < width && temp >= 0)
+            trace_intersection(input, 0, temp);
     }
 
-    // 4th step - Find all intersection point
-    //size_t* xlist = calloc(0, sizeof(size_t));
-    //size_t* ylist = calloc(0, sizeof(size_t));
-    //size_t length2 = 0;
+    get_rect(input, &thetalist_inf, &thetalist_sup, &rholist_inf, &rholist_sup, length_inf, length_sup);
 
-    /*
-    for(size_t i = 0; i < length; i++){
-        for(size_t j = i+1; j < length; j++){
-            size_t x = 17, y = 41;
-            if(get_intersection(rholist[i], rholist[j], thetalist[i], thetalist[j], &x, &y, width, height)){
-                trace_intersection(input, y, x);
-                //set_pixel(input, y, x, to_color(255,0,0,255));
-                //length2++;
-                //xlist = realloc(xlist, length*sizeof(size_t));
-                //xlist[length2-1] = x;
-                //ylist = realloc(ylist, length*sizeof(size_t));
-                //ylist[length2-1] = y;
-            }
-        }
-    }
-
-    // 5th step - Get the index of the highest and lowest interaction function
-
-    // 6th step - Erase all detected line by covering them in black
-
-    // 7th step - Cut the picture to only have the grid
-
-    // nth step - Free dynamic memory allocation
-    */
-
-    //free(xlist);
-    //free(ylist);
-
-    //free(thetalist_inf);
-    //free(thetalist_sup);
-    //free(rholist_sup);
-    //free(rholist_inf);
+    free(thetalist);
+    free(rholist);
+    free(thetalist_inf);
+    free(rholist_inf);
+    free(thetalist_sup);
+    free(rholist_sup);
     
     free_matrice(A);
-    printf("hi bitches!\n");
-    return findangle(thetalist_inf,length_inf);
+    return thetamin;
 }
