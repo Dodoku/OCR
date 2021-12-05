@@ -76,6 +76,12 @@ void save_grid(char *path, int *grid) {
     fclose(fp);
 }
 
+void save_grid_in_string(char str[82], int *grid){
+    for (int i = 0; i < sudoSize*sudoSize; i++) {
+        str[i] = *(grid + i);
+    }
+}
+
 /*
  * Prints the grid on the console
  * @param grid (int*) : array of sudoku grid
