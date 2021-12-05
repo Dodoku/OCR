@@ -22,6 +22,19 @@ SDL_Surface* split(SDL_Surface* image, int x1, int y1, int x2, int y2)
     return ret;
 }
 
+struct pic_pos* to_network(SDL_Surface* image, int* x1, int* y1, int* x2, int* y2)
+{
+    struct pic_pos* ret = malloc(sizeof(struct pic_pos)*81);
+    if(!ret)
+        printf("malloc error\n");
+    for(int i=0;i<81;i++)
+    {
+        struct pic_pos current = {resize(split(image,x1[i],y1[i],x2[i],y2[i]),28,28),x1[i],y1[i],x2[i],y2[i]};
+        ret[i]=current;
+    }
+    return ret;
+}
+
 void insert_picture(SDL_Surface* image, int x1, int y1, int x2, int y2, int n)
 {
     char path[]="src/assets/0.jpg";

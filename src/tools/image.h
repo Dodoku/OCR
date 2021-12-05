@@ -3,6 +3,15 @@
 
 #include <SDL2/SDL.h>
 
+struct pic_pos
+{
+    SDL_Surface* image;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+};
+
 SDL_Surface *create_empty(int w, int h);
 SDL_Surface *copy(SDL_Surface* src);
 
