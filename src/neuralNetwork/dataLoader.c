@@ -6,7 +6,7 @@
 
 #include "neuralNetwork.h"
 #include "dataLoader.h"
-
+#include "../tools/image.h"
 
 Data init_data(int nbLines, int nbColumns){
     Data data;
@@ -16,9 +16,14 @@ Data init_data(int nbLines, int nbColumns){
 
     data.data = malloc(data.nbLines * sizeof(*data.data));
 
-    for(int i = 0; i < data.nbLines; i++)
+    for(int i = 0; i < data.nbLines; i++){
         data.data[i] = malloc(data.nbColumns * sizeof(**data.data));
+    }
 
+    for(int i = 0; i < data.nbLines; i++)
+        for(int j = 0; j < data.nbColumns; j++)
+            data.data[i][j] = 0;
+        
     return data;
 }
 
@@ -90,6 +95,8 @@ void save_data(Data *data, char *path){
         }
         fprintf(fp, "\n");
     }
+
+    fclose(fp);
 }
 
 void free_data(Data *data){
@@ -127,7 +134,8 @@ void save_network(Network *net, char *path){
     if(max < net->output.nbNeurons)
         max = net->output.nbNeurons;
 
-    Data data = init_data(2 + net->nbHiddens * net->hiddens[0].nbNeurons, max);
+    Data data = init_data(1 + net->output.nbNeurons + net->hiddens[0].nbNeurons
+                                     * net->nbHiddens, max);
     data.data[0][0] = net->input.nbNeurons;
     data.data[0][1] = net->nbHiddens;
     data.data[0][2] = net->hiddens[0].nbNeurons;
@@ -146,4 +154,62 @@ void save_network(Network *net, char *path){
 
     save_data(&data, path);
     free_data(&data);
+}
+
+FILE *open_train(char *path){
+    FILE *fp;
+
+    fp = fopen(path, "r");
+    if (!fp)
+        errx(1, "Couldn't open %s\n", path);
+
+    return fp;
+}
+
+
+TrainData read_train_image(FILE *file){
+    TrainData data;
+
+    data.expectedNumber = -1;
+
+    char c;
+    int readImage = 0;
+
+    SDL_Surface *image = create_empty(28, 28);
+    size_t x = 0;
+
+    while((c = fgetc(file)) != EOF){
+        if(c == '\n')
+            break;
+        if(c >= '0' && c <= '9' && x < 28*28){
+            if(readImage){
+                set_pixel(image, x%28, x/28, (c - '0') == 0 ? to_color(0, 0, 0, 255)
+                                                : to_color(255, 255, 255, 255));
+                x++;
+            }else{
+                data.expectedNumber = c - '0';
+                readImage = 1;  
+            }
+        }
+    }
+
+    if(data.expectedNumber == -1)
+        SDL_FreeSurface(image);
+    else
+        data.image = image;
+
+    return data;
+}
+
+int countLines(FILE *fp){
+
+    int lines = 0;
+    
+    while(!feof(fp)){
+        if(getc(fp) == '\n')
+            lines++;
+    }
+
+    fclose(fp);
+    return lines;
 }

@@ -17,7 +17,7 @@ Filter :
 
 To apply all filters you can use filter `all`
 
-To apply the filter on all images you can use `./build/imageProcess - -`
+To apply the filter on all images you can use `./build/imageProcess all - -`
 
 ## Image Splitting
 First you have to build the executable of the module with `make module/imageSpliter`

@@ -1,19 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <gtk/gtk.h>
+#include "gui/gui.h"
 #include "imageGenerator/digit_picture.h"
 
 int main() {
-    /*int sudoku[] ={
-        1,2,3,4,5,6,7,8,9,
-        9,8,7,6,5,4,3,2,1,
-        1,4,7,8,5,2,3,6,9,
-        9,6,3,2,5,8,7,4,1,
-        3,2,1,6,5,4,9,8,7,
-        7,8,9,4,5,6,1,2,3,
-        8,5,2,3,6,9,7,4,1,
-        1,4,7,8,5,2,3,6,9,
-        1,2,3,4,5,6,7,8,9
-    };
-    */
-
-    return 0;
+    init_gui();
 }

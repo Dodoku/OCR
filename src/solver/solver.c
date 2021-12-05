@@ -34,6 +34,21 @@ void init_grid(char *path, int *grid) {
     fclose(fp);
 }
 
+void init_grid_with_string(char* str, int* grid) {
+    int i = 0;
+    while(str[i] != '\0'){
+        if (str[i] == '.')
+            *(grid + i) = 0;
+        else if (str[i] > '0' && str[i] <= '9')
+            *(grid + i) = str[i] - '0';
+        else if (str[i] != '\n' && str[i] != '\0' && str[i] != ' ')
+            errx(1, "String doesn't respect the format");
+        else
+            continue;
+        i++;
+    }
+}
+
 /*
  * Save the grid in the file
  * @param path (char*) : path of the out file
@@ -59,6 +74,12 @@ void save_grid(char *path, int *grid) {
     }
 
     fclose(fp);
+}
+
+void save_grid_in_string(char str[82], int *grid){
+    for (int i = 0; i < sudoSize*sudoSize; i++) {
+        str[i] = *(grid + i);
+    }
 }
 
 /*

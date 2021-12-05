@@ -12,8 +12,9 @@ int filter[5][5] =
      { 4,16,24,16, 4},
      { 1, 4, 6, 4, 1}};
 
-/*
+/**
  * Returne a new picture with a gaussian blur
+ * /!\ IMAGE IS DESTROYED /!\
  * @param image (SDL_Image) : the picture on wich we apply the filter
  * @param n (int) : the times we apply the filter, to get a bigger effect
  * @return (SDL_Surface) : return the treated picture
@@ -35,9 +36,9 @@ SDL_Surface* gaussian_blur(SDL_Surface* image, int n){
                 set_pixel(new_image, i, j, to_color(new_pixel/256,new_pixel/256, new_pixel/256, new_pixel/256));
             }
         }
-        image = new_image;
     }
-    return image;
+    free(image);
+    return new_image;
 }
 
 SDL_Surface* simple_blur(SDL_Surface* image, int n){
@@ -54,7 +55,7 @@ SDL_Surface* simple_blur(SDL_Surface* image, int n){
                 set_pixel(new_image, i, j, to_color(new_pixel/9,new_pixel/9, new_pixel/9, new_pixel/9));
             }
         }
-        image = new_image;
     }
-    return image;
+    free(image);
+    return new_image;
 }

@@ -13,14 +13,15 @@ BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
 CC = gcc
-CFLAGS = -Wall -Wextra -g $(shell sdl2-config --cflags)
-LDFLAGS = -export-dynamic $(shell sdl2-config --libs) -lm -lSDL2_image
+
+CFLAGS = -Wall -Wextra -pthread $(shell sdl2-config --cflags) `pkg-config --cflags gtk+-3.0`
+LDFLAGS = -export-dynamic -pthread $(shell sdl2-config --libs) -lm -lSDL2_image `pkg-config --libs gtk+-3.0`
 
 ALLFILES = $(shell find . -name "*.[ch]")
 SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "*main.c")
 OBJ = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 
-TOOLS = $(OBJ_DIR)/tools/image.o
+TOOLS = $(OBJ_DIR)/tools/image.o $(OBJ_DIR)/tools/hough.o
 
 all: init ocr
 
@@ -42,19 +43,21 @@ format:
 #
 # Builds
 #
-ocr: module/imageProcess module/imageSpliter module/neuralNetwork module/solver module/imageGenerator
 
-#ocr: $(OBJ)
-#	@echo "Linking OCR..."
-#	@$(CC) -o $@ $^ $(LDFLAGS)
-#	@echo "Build Finished"
+ocr: $(OBJ)
+	@echo "Linking OCR..."
+	@$(CC) -o $@ $^ $(LDFLAGS)
+	@make module/neuralNetwork
+	@make module/solver
+	@make module/imageGenerator
+	@echo "Build Finished"
 
 #
 #Modules
 #
 
 .SECONDEXPANSION:
-src-dependencies = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(shell find $(SOURCE_DIR)/$* -name "*.c")) 
+src-dependencies = $(patsubst $(SOURCE_DIR)/%.c, $(OBJ_DIR)/%.o, $(shell find $(SOURCE_DIR)/$* -name "*.c"))
 module/%: $${src-dependencies} ${TOOLS}
 	@echo "Linking $@..."
 	@$(CC) -o $(BUILD_DIR)/$(@F) $^ $(LDFLAGS)
@@ -75,7 +78,7 @@ clean:
 	@echo "Cleaning..."
 	@rm -f -r $(OBJ_DIR)
 	@rmdir --ignore-fail-on-non-empty $(BUILD_DIR)
-	
+
 cleanall:
 	@echo "Cleaning of all build files..."
 	@rm -f -r $(BUILD_DIR)

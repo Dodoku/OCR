@@ -3,12 +3,13 @@
 #include "../tools/image.h"
 #include "rotate.h"
 
-/*
- * What the function does
+/**
+ * Rotate image by angle in radian.
+ * /!\ SRC IMAGE IS DESTROYED /!\
  * @param image (SDL_Surface*) : the picture to rotate
  * @param angle (int) : gives the angle to rotate in radian
  * @return (SDL_Surface*) : return the rotated picture
- * @authur Nicolas Prevost
+ * @author Nicolas Prevost
  */
 SDL_Surface *rotate(SDL_Surface *image, double angle) {
     int width = image->w;
@@ -39,5 +40,7 @@ SDL_Surface *rotate(SDL_Surface *image, double angle) {
             }
         }
     }
+    
+    SDL_FreeSurface(image);
     return ret;
 }
