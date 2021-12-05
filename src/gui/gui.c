@@ -182,7 +182,6 @@ gboolean loopRefreshSensitive(){
                                                             "stack1"));
     gtk_widget_set_sensitive(confirmButton, !data->inThread);
     gtk_widget_set_sensitive(stack, !data->inThread);
-    printf("%d\n", data->inThread);
     return TRUE;
 }
 
