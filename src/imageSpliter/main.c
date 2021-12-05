@@ -9,11 +9,14 @@
 
 int main(int argc, char *argv[])
 {
-    SDL_Surface* image = load("tests/assets/image_01.jpeg");
-    insert_picture(image, 5,5,150,150,4);
-    save(image, "out.jpeg");
-
-    SDL_FreeSurface(image);
-    return 0;
+    int* x1=malloc(sizeof(int)*81);
+    int* x2=malloc(sizeof(int)*81);
+    int* y1=malloc(sizeof(int)*81);
+    int* y2=malloc(sizeof(int)*81);
+    little_square(0,0,100,100,x1,y1,x2,y2);
+    for(int i=0;i<81;i++)
+    {
+        printf("%d %d = %d %d \n",x1[i],y1[i],x2[i],y2[i] );
+    }
 
 }
