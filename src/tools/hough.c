@@ -478,12 +478,6 @@ double hough_transform(SDL_Surface* input, ){
 }
 */
 
-
-    (*length)++;
-    *thetalist = realloc(*thetalist, (*length) * sizeof(unsigned int));
-    *rholist = realloc(*rholist, (*length) * sizeof(int));
-    (*thetalist)[(*length)-1] = theta;
-    (*rholist)[(*length)-1] = rho;
 double hough_transform(SDL_Surface* input, unsigned int** thetalist_inf,
                                             unsigned int** thetalist_sup,
                                             int** rholist_inf,
