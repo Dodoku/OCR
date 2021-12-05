@@ -58,3 +58,23 @@ void insert_picture(SDL_Surface* image, int x1, int y1, int x2, int y2, int n)
         }
     }
 }
+
+//le grand carre c'est (X1,Y1),(X2,Y2)
+//x1,x2,y1,y2 c'est des tableaux de 81 int
+void little_square(int X, int Y, int* x1, int* y1, int* x2, int* y2)
+{
+    int Xgap = (X2-X1)/9;
+    int Ygap = (Y2-Y1)/9;
+    int index=0;
+    for(int i=0;i<9;i++)
+    {
+        for(int j=0;j<9;j++)
+        {
+            x1[index]=X1+i*Xgap;
+            y1[index]=Y1+j*Ygap;
+            x2[index]=X1+(i+1)*Xgap
+            y2[index]=Y2+(j+1)*Ygap;
+            index++;
+        }
+    }
+}
