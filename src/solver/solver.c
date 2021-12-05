@@ -156,40 +156,7 @@ bool is_line_solved(int y, int *grid) {
  * @author Valentin Uhlrich
  */
 bool is_square_solved(int x, int y, int *grid) {
-    x /= 3;    GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "network_image"));
-
-    GtkWidget* widget = GTK_WIDGET((gtk_builder_get_object(data->builder, "network_data_file")));
-
-    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget));
-    int *x1List = malloc(81 * sizeof(int));
-    int *x2List = malloc(81 * sizeof(int));
-    int *y1List = malloc(81 * sizeof(int));
-    int *y2List = malloc(81 * sizeof(int));
-    data->networkSurface = rotate(data->withoutEdgeMap, (double)data->angle*M_PI/180);
-    little_square(data->x1, data->y1, data->x2, data->y2, x1List, x2List, y1List, y2List);
-    struct pic_pos* pos = to_network(data->networkSurface, x1List, x2List, y1List, y2List);
-
-    save(data->networkSurface, "grid.png");
-    char *s = malloc(sizeof(char)*83);
-    Network net = load_network(filename);
-    printf("%i\n", net.nbHiddens);
-    printf("%i\n", net.input.nbNeurons);
-    for(int i = 0; i < 81; i++){
-        char name[10];
-        name[0] = i + '0';
-        name[1] = '\0';
-        strcat(name, ".png");
-        save(pos[i].image, name);
-        s[i] = eval_number(&net, pos[i].image) + '0';
-        if(s[i] == '0'){
-            s[i] = '.';
-        }
-        SDL_FreeSurface(pos[i].image);
-    }
-    s[81] = '\0'; 
-    printf("%s\n", s);
-    free_network(&net);
-    data->output = s;
+    x /= 3;
     y /= 3;
 
     for (int i = 1; i <= sudoSize; i++) {

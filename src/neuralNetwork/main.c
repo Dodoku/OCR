@@ -19,7 +19,13 @@ int main(int argc, char *argv[]){
 
     Network net;
 
-    net = load_network("record_numbers.data");
+    if(argc < 2){
+        printf("Usage: ./neuralNetwork (path)");
+        return 1;
+    }
+
+
+    net = load_network(argv[1]);
 
     //train_number(&net, "train.data");
 

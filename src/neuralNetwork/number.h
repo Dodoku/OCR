@@ -1,6 +1,7 @@
 #ifndef NUMBER_H
 #define NUMBER_H
 
+#include <gtk/gtk.h>
 #include <SDL2/SDL_image.h>
 
 Network init_number();
