@@ -40,8 +40,6 @@ int main(int argc, char *argv[]) {
     }
     if(argc == 2)
     {
-
-
         int* sudoku = malloc(sizeof(int)*82);
         init_grid(argv[1],sudoku);
 
@@ -54,7 +52,7 @@ int main(int argc, char *argv[]) {
         printf("Picture generated and saved as \"%s\"\n", out);
         return 0;
     }
-    if(argc == 2)
+    if(argc == 3)
     {
         int* sudoku = malloc(sizeof(int)*82);
         init_grid(argv[1],sudoku);
