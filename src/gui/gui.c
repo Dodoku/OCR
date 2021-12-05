@@ -116,26 +116,8 @@ static void *refresh_image_solver(){
 }
 
 static void *refresh_image_network(){
-    GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "network_image"));
-
-    GtkWidget* widget = GTK_WIDGET((gtk_builder_get_object(data->builder, "network_data_file")));
-
-    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget));
-    struct pic_pos* pos = to_network(data->withoutEdgeMap, data->x1, data->y1, data->x2, data->y2);
-
-    char *s = malloc(sizeof(char)*82);
-    Network net = load_network(filename);
-    for(int i = 0; i < 81; i++){
-        s[i] = eval_number(&net, pos[i].image) + '0';
-        if(s[i] == '0'){
-            s[i] = '.';
-        }
-        SDL_FreeSurface(pos[i].image);
-    }
-
-    free_network(&net);
-    data->output = s;
-    printf("%s\n", s);
+//
+    
     
     /*GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->withoutEdgeMap);
     int width = gdk_pixbuf_get_width (pixbuf);
@@ -273,11 +255,12 @@ static void* refresh_image_rotate(void * p_data){
 
     if(data->rotateImage != NULL)
        SDL_FreeSurface(data->rotateImage);
+
     data->rotateImage = copy(data->editedImage);
     if(angle >= -180 && angle <= 180)
         data->rotateImage = rotate(data->rotateImage, angle*M_PI/180);
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->rotateImage);
-
+    data->angle = angle;
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
     width = (double)width * ((double)500/height);
