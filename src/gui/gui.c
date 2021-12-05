@@ -122,12 +122,24 @@ static void* refresh_image_filter(void * p_data){
     if(fdata->grayscale)
         data->editedImage = to_grayscale(data->editedImage);
     if(fdata->blur)
-        data->editedImage = gaussian_blur(data->editedImage, fdata->blur);
+        data->editedImage = simple_blur(data->editedImage, fdata->blur);
     if(fdata->otsu)
         data->editedImage = otsu(data->editedImage, fdata->otsu);
     if(fdata->edgeMap)
         data->editedImage = edgemap(data->editedImage);
 
+    if(fdata->isAuto && !test_proportions(data->editedImage) && fdata->otsu < 50){
+        fdata->blur += 1;
+        fdata->otsu += 10;
+        GtkSpinButton *blurSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                        "nbblur"));
+        GtkSpinButton *ostuSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
+                                                        "nbotsu"));
+        gtk_spin_button_set_value(blurSpin, fdata->blur);
+        gtk_spin_button_set_value(ostuSpin, fdata->otsu);
+        refresh_image_filter(fdata);
+        return NULL;
+    }
     GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->editedImage);
     int width = gdk_pixbuf_get_width (pixbuf);
     int height = gdk_pixbuf_get_height (pixbuf);
@@ -175,6 +187,7 @@ void split_update(){
 }
 
 void filter_auto(){
+    struct filter_data *fdata = malloc(sizeof(struct filter_data));
     GtkSwitch *grayscaleToggle = GTK_SWITCH(gtk_builder_get_object(data->builder, 
                                                             "grayscale_switch"));
     GtkSpinButton *blurSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(data->builder, 
@@ -187,8 +200,17 @@ void filter_auto(){
     gtk_spin_button_set_value(blurSpin, 1);
     gtk_spin_button_set_value(ostuSpin, 1);
     gtk_switch_set_active(edgeMapToggle, 1);
+    
+    fdata->grayscale = 1;
+    fdata->blur = 1;
+    fdata->otsu = 1;
+    fdata->edgeMap = 1;
+    fdata->isAuto = 1;
 
-    filter_update();
+    if(data->inThread)
+        pthread_exit(&data->thread);
+    data->inThread = 1;
+    pthread_create(&data->thread, NULL, refresh_image_filter, fdata);
 }
 
 void filter_update(){
@@ -207,11 +229,20 @@ void filter_update(){
     fdata->blur = gtk_spin_button_get_value(blurSpin);
     fdata->otsu = gtk_spin_button_get_value(ostuSpin);
     fdata->edgeMap = gtk_switch_get_active(edgeMapToggle);
+    fdata->isAuto = 0;
 
     if(data->inThread)
         pthread_exit(&data->thread);
     data->inThread = 1;
     pthread_create(&data->thread, NULL, refresh_image_filter, fdata);
+}
+
+void rotate_auto(){
+    double angle = hough_transform(data->editedImage);
+    printf("%f\n", angle);
+    GtkRange *scale = GTK_RANGE(gtk_builder_get_object(data->builder, "rotation_slider"));
+    gtk_range_set_value(scale, -angle*180/M_PI);
+    rotate_update();
 }
 
 void rotate_update(){
@@ -332,6 +363,8 @@ GtkBuilder *init_gui(){
                                                             "network_data_file"));
     GtkButton* apply_rotate = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "apply_rotate"));
+    GtkButton* auto_rotate = GTK_BUTTON(gtk_builder_get_object(builder, 
+                                                            "auto_rotate_button"));
     GtkButton* apply_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "apply_filter"));
     GtkButton* auto_filter = GTK_BUTTON(gtk_builder_get_object(builder, 
@@ -353,6 +386,7 @@ GtkBuilder *init_gui(){
     g_signal_connect(apply_rotate, "clicked", G_CALLBACK(rotate_update), data);
     g_signal_connect(apply_filter, "clicked", G_CALLBACK(filter_update), data);
     g_signal_connect(auto_filter, "clicked", G_CALLBACK(filter_auto), data);
+    g_signal_connect(auto_rotate, "clicked", G_CALLBACK(rotate_auto), data);
 
     menu_signals(builder);
 

@@ -8,6 +8,7 @@ SDL_Surface *to_grayscale(SDL_Surface *image);
 SDL_Color grayscale(SDL_Color color);
 
 void otsu_transform(SDL_Surface* image, int decallage);
+int test_proportions(SDL_Surface* image);
 
 int otsu_threshold(int* A, int N);
 

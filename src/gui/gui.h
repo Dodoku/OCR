@@ -34,6 +34,8 @@ struct filter_data {
     int blur;
     int otsu;
     int edgeMap;
+
+    int isAuto;
 };
 
 void error_message(char *message);

@@ -64,6 +64,17 @@ int otsu_threshold(int* A, int N){
     return (int) threshold;
 }
 
+int test_proportions(SDL_Surface* image){
+    int sum = 0;
+    for(int i = 0; i < image->w/10; i++){
+        for(int j = 0; j < image->h/10; j++){
+            if(get_pixel(image, i, j).r >= 255/2)
+                sum++;
+        }
+    }
+    return (double) sum / (image->w/100 * image->h/100) < 0.05;
+}
+
 void otsu_transform(SDL_Surface* image, int decallage){
     const SDL_Color black = to_color(0,0,0,255);
     const SDL_Color white = to_color(255,255,255,255);

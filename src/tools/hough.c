@@ -10,7 +10,7 @@
 #define tmax 180
 #define margin 50
 
-/*size_t calc_rhomax(SDL_Surface* image){
+size_t calc_rhomax(SDL_Surface* image){
     return (size_t) sqrt(image->w * image->w + image->h * image->h);
 }
 
@@ -275,4 +275,3 @@ double hough_transform(SDL_Surface* input){
     printf("hi bitches!\n");
     return findangle(thetalist_inf,length_inf);
 }
-*/
