@@ -3,6 +3,7 @@
 #include <err.h>
 #include "wall_draw.h"
 #include "../tools/image.h"
+#include "../solver/solver.h"
 
 
 /*
@@ -64,30 +65,6 @@ void display_digit(SDL_Surface *image, int x, int y, int n, SDL_Color color) {
 
 SDL_Surface* generate_digit_picture(char* sudoku, char* solved) {
 
-    int grid[81] = {0};
-    int solvedgrid[81] = {0};
-    int i=0,i2=0;
-    while(sudoku[i]!=0)
-    {
-        if(sudoku[i]==' '||sudoku[i]=='\n')
-        {
-            i++;
-        }
-        else
-        {
-            if(sudoku[i]=='.')
-            {
-                grid[i2]=0;
-            }
-            else
-            {
-                grid[i2]=sudoku[i]-'0';
-            }
-            solvedgrid[i2]=solved[i]-'0';
-            i2++;
-            i++;
-        }
-    }
 
     SDL_Surface *image = create_empty(993, 993);
 
@@ -102,7 +79,7 @@ SDL_Surface* generate_digit_picture(char* sudoku, char* solved) {
     int horizontal = 0;
     int vertical = 0;
     for (int index = 0; index < 81; index++) {
-        display_digit(image, x, y, solvedgrid[index],solvedgrid[index]==grid[index]?black:red);
+        display_digit(image, x, y, solved[index],solved[index]==sudoku[index]?black:red);
         horizontal++;
 
         if (horizontal == 3 || horizontal == 6 || horizontal == 9) {
