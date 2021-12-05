@@ -26,6 +26,10 @@
 #include "../neuralNetwork/dataLoader.h"
 #include "../neuralNetwork/number.h"
 
+#include "../solver/solver.h"
+
+#include "../imageGenerator/digit_picture.h"
+
 void error_message(char *message)
 {
     GtkWidget *dialog;
@@ -84,6 +88,33 @@ struct gui_data *data;
 //------------------------------------------------------------------------------
 // THREADS
 //------------------------------------------------------------------------------
+
+static void *refresh_image_solver(){
+    GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "image2"));
+
+    int grid[81];
+    init_grid_with_string(data->output, grid);
+    solve(grid);
+
+    char solved[82];
+    save_grid_in_string(solved, grid);
+
+    if(data->generatedImage != NULL)
+        SDL_FreeSurface(data->generatedImage);
+
+    data->generatedImage = generate_digit_picture(data->output, solved);
+
+    GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->generatedImage);
+    int width = gdk_pixbuf_get_width (pixbuf);
+    int height = gdk_pixbuf_get_height (pixbuf);
+    width = (double)width * ((double)600/height);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, 600, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(image, pixbuf);
+
+    data->inThread = 0;
+    return NULL;
+}
+
 static void *refresh_image_network(){
     GtkImage *image = GTK_IMAGE(gtk_builder_get_object(data->builder, "network_image"));
 
@@ -92,7 +123,7 @@ static void *refresh_image_network(){
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget));
     struct pic_pos* pos = to_network(data->withoutEdgeMap, data->x1, data->y1, data->x2, data->y2);
 
-    char s[82] = {0};
+    char *s = malloc(sizeof(char)*82);
     Network net = load_network(filename);
     for(int i = 0; i < 81; i++){
         s[i] = eval_number(&net, pos[i].image) + '0';
@@ -103,7 +134,7 @@ static void *refresh_image_network(){
     }
 
     free_network(&net);
-
+    data->output = s;
     printf("%s\n", s);
     
     /*GdkPixbuf *pixbuf = gtk_image_new_from_sdl_surface(data->withoutEdgeMap);
@@ -271,6 +302,13 @@ gboolean loopRefreshSensitive(){
 // EVENTS
 //------------------------------------------------------------------------------
 
+void apply_solved(){
+    if(data->inThread)
+        pthread_exit(&data->thread);
+    data->inThread = 1;
+    pthread_create(&data->thread, NULL, refresh_image_solver, NULL);
+}
+
 void apply_network(){
     if(data->inThread)
         pthread_exit(&data->thread);
@@ -393,11 +431,11 @@ void load_image(GtkFileChooserButton *button, gpointer user_data){
     Data->slipImage = copy(Data->loadImage);
     Data->withoutEdgeMap = copy(Data->loadImage);
 
-    Data->minX = 0;
-    Data->minY = 0;
+    Data->x1 = 0;
+    Data->y1 = 0;
 
-    Data->maxX = Data->loadImage->w;
-    Data->maxY = Data->loadImage->h;
+    Data->x2 = Data->loadImage->w;
+    Data->y2 = Data->loadImage->h;
 
     filter_update();
 }
@@ -481,6 +519,8 @@ GtkBuilder *init_gui(){
                                                             "auto_filter"));
     GtkButton* network_apply = GTK_BUTTON(gtk_builder_get_object(builder, 
                                                             "apply_network"));
+    GtkButton* resolve = GTK_BUTTON(gtk_builder_get_object(builder, 
+                                                            "confirmbutton"));
     data->mainWindow = mainWindow;
 
     g_timeout_add(100, (GSourceFunc)loopRefreshSensitive, data);
@@ -502,6 +542,7 @@ GtkBuilder *init_gui(){
     g_signal_connect(auto_rotate, "clicked", G_CALLBACK(rotate_auto), data);
     g_signal_connect(apply_splitting, "clicked", G_CALLBACK(split_update), data);
     g_signal_connect(network_apply, "clicked", G_CALLBACK(apply_network), data);
+    g_signal_connect(resolve, "clicked", G_CALLBACK(apply_solved), data);
 
     menu_signals(builder);
 
