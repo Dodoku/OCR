@@ -3,9 +3,18 @@
 
 #include <SDL2/SDL.h>
 
-struct pic_pos
+struct pic_pos //for picture and position
 {
     SDL_Surface* image;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+};
+
+struct int_pos
+{
+    int value;
     int x1;
     int y1;
     int x2;

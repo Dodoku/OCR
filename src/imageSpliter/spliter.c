@@ -18,6 +18,15 @@ SDL_Surface* split(SDL_Surface* image, int x1, int y1, int x2, int y2)
     return ret;
 }
 
+/*
+ * return a pic_pos for the network
+ * @param image (SDL_Surface*) : the image to split
+ * @param x1,y1 (int) : coordonates at the right top corner
+ * @param x2,y2 (int) : coordonates at the bottom left corner
+ * @return (pic_pos*) : return the struct
+ * @author Nicolas Prevost
+ */
+
 struct pic_pos* to_network(SDL_Surface* image, int* x1, int* y1, int* x2, int* y2)
 {
     struct pic_pos* ret = malloc(sizeof(struct pic_pos)*81);
