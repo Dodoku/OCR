@@ -550,7 +550,7 @@
                               <object class="GtkSpinButton" id="right_spitting">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
-                                <property name="adjustment">adjustment_right</property>
+                                <property name="adjustment">adjustment_top</property>
                               </object>
                               <packing>
                                 <property name="x">775</property>
@@ -561,7 +561,7 @@
                               <object class="GtkSpinButton" id="bottom_splitting">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
-                                <property name="adjustment">adjustment_bottom</property>
+                                <property name="adjustment">adjustment_top</property>
                               </object>
                               <packing>
                                 <property name="x">350</property>
@@ -572,7 +572,7 @@
                               <object class="GtkSpinButton" id="left_splitting">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
-                                <property name="adjustment">adjustment_left</property>
+                                <property name="adjustment">adjustment_top</property>
                               </object>
                               <packing>
                                 <property name="y">300</property>
