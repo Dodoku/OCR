@@ -2,8 +2,9 @@
 #include "digit_picture.h"
 #include <string.h>
 #include "../tools/image.h"
+#include <err.h>
 
-void init_grid(char *path, int *grid) {
+void init_grid(char *path, char *grid) {
     FILE *fp;
     char c;
 
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
     }
     if(argc == 2)
     {
-        int* sudoku = malloc(sizeof(int)*82);
+        char* sudoku = malloc(sizeof(int)*82);
         init_grid(argv[1],sudoku);
 
         char out[2048];
@@ -54,10 +55,10 @@ int main(int argc, char *argv[]) {
     }
     if(argc == 3)
     {
-        int* sudoku = malloc(sizeof(int)*82);
+        char* sudoku = malloc(sizeof(int)*82);
         init_grid(argv[1],sudoku);
 
-        int* solved = malloc(sizeof(int)*82);
+        char* solved = malloc(sizeof(int)*82);
         init_grid(argv[2],solved);
 
         char out[2048];
