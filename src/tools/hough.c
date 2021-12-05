@@ -477,6 +477,13 @@ double hough_transform(SDL_Surface* input, ){
     return thetamin;
 }
 */
+
+
+    (*length)++;
+    *thetalist = realloc(*thetalist, (*length) * sizeof(unsigned int));
+    *rholist = realloc(*rholist, (*length) * sizeof(int));
+    (*thetalist)[(*length)-1] = theta;
+    (*rholist)[(*length)-1] = rho;
 double hough_transform(SDL_Surface* input, unsigned int** thetalist_inf,
                                             unsigned int** thetalist_sup,
                                             int** rholist_inf,
@@ -499,23 +506,23 @@ double hough_transform(SDL_Surface* input, unsigned int** thetalist_inf,
 
     for (size_t i = 0; i < length; i++){
         if (thetalist[i]-thetalist[0] < 80 || thetalist[i]-thetalist[0] >= 170){
-            length_inf++;
-            (*thetalist_inf) = realloc((*thetalist_inf), length_inf * sizeof(unsigned int));
-            (*rholist_inf) = realloc((*rholist_inf), length_inf * sizeof(int));
-            (*thetalist_inf)[length_inf-1] = (*thetalist)[i];
-            (*rholist_inf)[length_inf-1] = (*rholist)[i];
+            (*length_inf)++;
+            *thetalist_inf = realloc((*thetalist_inf), (*length_inf) * sizeof(unsigned int));
+            *rholist_inf = realloc((*rholist_inf), (*length_inf) * sizeof(int));
+            (*thetalist_inf)[(*length_inf)-1] = thetalist[i];
+            (*rholist_inf)[(*length_inf)-1] = rholist[i];
         }
         else{
-            length_sup++;
-            (*thetalist_sup) = realloc((*thetalist_sup), length_sup * sizeof(unsigned int));
-            (*rholist_sup) = realloc((*rholist_sup), length_sup * sizeof(int));
+            (*length_sup)++;
+            *thetalist_sup = realloc((*thetalist_sup), (*length_sup) * sizeof(unsigned int));
+            *rholist_sup = realloc((*rholist_sup), (*length_sup) * sizeof(int));
             (*thetalist_sup)[length_sup-1] = thetalist[i];
             (*rholist_sup)[length_sup-1] = rholist[i];
         }
     }
     
-    quickSort0(rholist_inf, thetalist_inf, 0, length_inf-1);
-    quickSort90(rholist_sup, thetalist_sup, 0, length_sup-1);
+    quickSort0(rholist_inf, thetalist_inf, 0, (*length_inf)-1);
+    quickSort90(rholist_sup, thetalist_sup, 0, (*length_sup)-1);
 
     free(thetalist);
     free(rholist);

@@ -48,6 +48,11 @@ void quickSort(int** R,  size_t l, size_t h);
 
 double findangle(unsigned int* thetalist, size_t length);
 
-double hough_transform(SDL_Surface* input);
+double hough_transform(SDL_Surface* input, unsigned int** thetalist_inf,
+                                            unsigned int** thetalist_sup,
+                                            int** rholist_inf,
+                                            int** rholist_sup,
+                                            size_t* length_inf,
+                                            size_t* length_sup)
 
 #endif
