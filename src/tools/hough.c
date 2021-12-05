@@ -177,7 +177,7 @@ int get_intersection(int rho1, int rho2, size_t theta1, size_t theta2,
 }
 
 void trace_intersection(SDL_Surface* input, size_t x, size_t y){
-    size_t width = input->w, height = input->h;
+    size_t width =  input->w, height = input->h;
     size_t xmax = x + 2, xmin = x - 2;
     size_t ymax = y + 1, ymin = y - 2;
 
@@ -484,7 +484,6 @@ double hough_transform(SDL_Surface* input, unsigned int** thetalist_inf,
                                             int** rholist_sup,
                                             size_t* length_inf,
                                             size_t* length_sup){
-    size_t width = input->w, height = input->h;
     size_t rhomax = calc_rhomax(input);
     int** A;
     // 1st step - Get hough
